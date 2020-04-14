@@ -27,7 +27,8 @@ class TaskEditor extends React.Component {
   };
 
   launchTask = () => {
-    window.open('http://localhost:8080/boards/example');
+    const { history } = this.props;
+    history.push('/session/');
   };
 
   render() {

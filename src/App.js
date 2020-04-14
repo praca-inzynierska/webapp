@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navbar from 'react-bulma-components/lib/components/navbar';
 import React from 'react';
-import Container from 'react-bulma-components/lib/components/container';
+import Content from 'react-bulma-components/lib/components/container';
 import TaskEditor from './pages/TaskEditor/TaskEditor';
 import './App.css';
+import 'react-bulma-components/dist/react-bulma-components.min.css';
+import TaskSession from './pages/TaskSession/TaskSession';
 
 function App() {
   return (
@@ -20,16 +22,19 @@ function App() {
             </Navbar.Container>
           </Navbar.Menu>
         </Navbar>
-        <Container>
+        <Content>
           <Switch>
             <Route path="/task-editor">
               <TaskEditor />
             </Route>
-            <Route path="/">
+            <Route path="/session">
+              <TaskSession />
+            </Route>
+            <Route path="/home">
               <div>Homepage</div>
             </Route>
           </Switch>
-        </Container>
+        </Content>
       </div>
     </Router>
   );
