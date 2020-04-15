@@ -28,7 +28,9 @@ class TaskEditor extends React.Component {
 
   launchTask = () => {
     const { history } = this.props;
-    history.push('/session/');
+    history.push(
+      `/session/${this.state.taskName}/${this.state.taskDescription}`,
+    );
   };
 
   render() {

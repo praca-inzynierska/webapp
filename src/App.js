@@ -24,12 +24,11 @@ function App() {
         </Navbar>
         <Content>
           <Switch>
-            <Route path="/task-editor">
-              <TaskEditor />
-            </Route>
-            <Route path="/session">
-              <TaskSession />
-            </Route>
+            <Route path="/task-editor" component={TaskEditor} />
+            <Route
+              path="/session/:taskName/:taskDescription"
+              component={TaskSession}
+            />
             <Route path="/home">
               <div>Homepage</div>
             </Route>
