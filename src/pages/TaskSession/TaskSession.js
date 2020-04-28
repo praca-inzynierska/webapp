@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter, useParams } from 'react-router';
+import { withRouter } from 'react-router';
 import '../../index.css';
 import 'react-bulma-components/dist/react-bulma-components.min.css';
 import './TaskSession.css';
