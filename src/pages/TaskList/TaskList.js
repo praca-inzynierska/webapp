@@ -63,6 +63,11 @@ class TaskList extends React.Component {
     history.push(`/task/${id}`);
   }
 
+  createTask() {
+    const { history } = this.props;
+    history.push(`/task/`);
+  }
+
   render() {
     const { state } = this;
     return (
@@ -106,6 +111,11 @@ class TaskList extends React.Component {
               ))}
             </tbody>
           </Table>
+        </Box>
+        <Box>
+          <Button color="success" onClick={() => this.createTask}>
+            Edit
+          </Button>
         </Box>
       </div>
     );

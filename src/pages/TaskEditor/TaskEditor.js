@@ -2,16 +2,14 @@ import React from 'react';
 import { withRouter } from 'react-router';
 import '../../index.css';
 import {
+  Checkbox,
   Control,
   Field,
   Input,
   Label,
   Textarea,
-  Checkbox,
 } from 'react-bulma-components/lib/components/form';
-import Button from 'react-bulma-components/lib/components/button';
-import Dropdown from 'react-bulma-components/lib/components/dropdown';
-import { Box, Heading } from 'react-bulma-components';
+import { Box, Heading, Dropdown, Button } from 'react-bulma-components';
 
 class TaskEditor extends React.Component {
   constructor(props) {
@@ -21,8 +19,8 @@ class TaskEditor extends React.Component {
     this.onUnitChange = this.onUnitChange.bind(this);
     this.onToolChange = this.onToolChange.bind(this);
     this.onTaskTypeChange = this.onTaskTypeChange.bind(this);
-
     this.launchTask = this.launchTask.bind(this);
+
     const { match } = this.props;
     const { taskId } = match.params;
     this.state = {
@@ -30,7 +28,7 @@ class TaskEditor extends React.Component {
       taskName: '',
       subject: '',
       taskType: '',
-      taskDuration: null,
+      taskDuration: 0,
       taskDurationUnit: 'minute',
 
       textChat: false,
@@ -95,41 +93,63 @@ class TaskEditor extends React.Component {
     ];
   }
 
-  onTitleChange = (event) => {
+  componentDidMount() {
+    const requestOptions = {
+      method: 'GET',
+      headers: { Username: 'user' },
+    };
+    const { setState, state } = this;
+    if (state.id !== null) {
+      fetch(`https://localhost:8080/tasks/${state.id}`, requestOptions)
+        .then((response) => response.json())
+        .then((data) =>
+          setState({
+            name: data.name,
+            subject: data.subject,
+            description: data.description,
+            type: data.type,
+            tools: data.tools,
+            time: data.time,
+          }),
+        );
+    }
+  }
+
+  onTitleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
     console.log(event.target.value);
-  };
+  }
 
-  onToolChange = (event) => {
+  onToolChange(event) {
     this.setState({ [event.target.name]: event.target.checked });
     console.log(event.target.checked);
-  };
+  }
 
-  onClassChange = (subject) => {
+  onClassChange(subject) {
     const { state } = this;
     this.setState({ subject });
     console.log(`${state.subject} selected`);
-  };
+  }
 
-  onUnitChange = (taskDurationUnit) => {
+  onUnitChange(taskDurationUnit) {
     const { state } = this;
     this.setState({ taskDurationUnit });
     console.log(`${state.subject} selected`);
-  };
+  }
 
-  onTaskTypeChange = (taskType) => {
+  onTaskTypeChange(taskType) {
     const { state } = this;
     this.setState({ taskType });
     console.log(`${state.taskType} selected`);
-  };
+  }
 
-  launchTask = () => {
+  launchTask() {
     const { history } = this.props;
     const { state } = this;
     history.push(`/session/${state.taskName}/${state.taskDescription}`);
-  };
+  }
 
-  saveTask = () => {
+  saveTask() {
     const { state } = this;
     const requestOptions = {
       method: 'POST',
@@ -147,7 +167,7 @@ class TaskEditor extends React.Component {
       'https://localhost:8080/tasks/create',
       requestOptions,
     ).then((response) => response.json());
-  };
+  }
 
   render() {
     const { taskDescription, taskName, taskDuration } = this.state;

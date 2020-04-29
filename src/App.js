@@ -19,6 +19,10 @@ function App() {
       component: TaskEditor,
     },
     {
+      path: '/task/',
+      component: TaskEditor,
+    },
+    {
       path: '/session/:taskName/:taskDescription',
       component: TaskSession,
     },
