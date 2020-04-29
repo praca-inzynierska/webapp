@@ -11,6 +11,7 @@ import {
 } from 'react-bulma-components/lib/components/form';
 import Button from 'react-bulma-components/lib/components/button';
 import Dropdown from 'react-bulma-components/lib/components/dropdown';
+import { Box, Heading } from 'react-bulma-components';
 
 class TaskEditor extends React.Component {
   constructor(props) {
@@ -22,6 +23,8 @@ class TaskEditor extends React.Component {
     this.onTaskTypeChange = this.onTaskTypeChange.bind(this);
 
     this.launchTask = this.launchTask.bind(this);
+    const { match } = this.props;
+    const { taskId } = match.params;
     this.state = {
       taskDescription: 'abc',
       taskName: '',
@@ -33,6 +36,7 @@ class TaskEditor extends React.Component {
       textChat: false,
       whiteboard: false,
       voiceChat: false,
+      id: taskId,
     };
     this.classes = [
       {
@@ -52,14 +56,17 @@ class TaskEditor extends React.Component {
       {
         id: 'day',
         name: 'dni',
+        value: 3600,
       },
       {
         id: 'hour',
         name: 'godzin',
+        value: 60,
       },
       {
         id: 'minute',
         name: 'minuty',
+        value: 1,
       },
     ];
     this.taskTypes = [
@@ -123,27 +130,17 @@ class TaskEditor extends React.Component {
   };
 
   saveTask = () => {
-    // // {
-    // //     "id": 123123,                           //tylko przy zwracaniu
-    // //     "teacher": 321313,                      //id autora zadania
-    // //     "subject(?)": "Przedmiot",              //id i/lub nazwa przedmiotu
-    // //     "name": "Nazwa zadania",
-    // //     "description": "Opis zadania (Markdown)",
-    // //     "tools": ["lista", "dostępnych", "narzędzi"],
-    // //     "time":  123123,                        //czas w milisekundach na zadanie
-    // //     "type": "typ rozwiązania",              //rodzaj odpowiedzi na zadanie, np rysunek z whiteboarda
-    // // }
     const { state } = this;
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        title: 'React POST Request Example',
         subject: state.subject,
         name: state.taskName,
         description: state.taskDescription,
         type: state.taskType,
         tools: this.tools.map((tool) => tool.id).filter((id) => state[id]),
+        time: state.taskDuration * this.units[state.taskDurationUnit].value,
       }),
     };
     fetch(
@@ -157,6 +154,9 @@ class TaskEditor extends React.Component {
     const { state, classes, taskTypes, units } = this;
     return (
       <div className="mainBox">
+        <Box>
+          <Heading size={2}>Tworzenie/edycja zadania</Heading>
+        </Box>
         <Field>
           <Label>Tytuł zadania</Label>
           <Control>
@@ -277,7 +277,9 @@ class TaskEditor extends React.Component {
         </Field>
         <Field kind="group">
           <Control>
-            <Button color="primary">Save</Button>
+            <Button color="primary" onClick={this.saveTask}>
+              Save
+            </Button>
           </Control>
           <Control>
             <Button onClick={this.launchTask}>Test</Button>
