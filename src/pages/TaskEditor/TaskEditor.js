@@ -25,10 +25,10 @@ class TaskEditor extends React.Component {
     const { taskId } = match.params;
     this.state = {
       taskDescription: 'abc',
-      taskName: '',
-      subject: '',
-      taskType: '',
-      taskDuration: 0,
+      taskName: 'Abc',
+      subject: 'matematyka',
+      taskType: 'whiteboard',
+      taskDuration: 20,
       taskDurationUnit: 'minute',
 
       textChat: false,
@@ -96,60 +96,58 @@ class TaskEditor extends React.Component {
   componentDidMount() {
     const requestOptions = {
       method: 'GET',
-      headers: { Username: 'user' },
     };
-    const { setState, state } = this;
+    const { state } = this;
     if (state.id !== null) {
-      fetch(`https://localhost:8080/tasks/${state.id}`, requestOptions)
+      fetch(`http://localhost:8080/tasks/${state.id}`, requestOptions)
         .then((response) => response.json())
-        .then((data) =>
-          setState({
-            name: data.name,
+        .then((data) => {
+          this.setState({
+            taskName: data.name,
             subject: data.subject,
-            description: data.description,
-            type: data.type,
-            tools: data.tools,
-            time: data.time,
-          }),
-        );
+            taskDescription: data.description,
+            taskType: data.type,
+            taskDuration: data.minutes,
+          });
+        });
     }
   }
 
-  onTitleChange(event) {
+  onTitleChange = (event) => {
     this.setState({ [event.target.name]: event.target.value });
     console.log(event.target.value);
-  }
+  };
 
-  onToolChange(event) {
+  onToolChange = (event) => {
     this.setState({ [event.target.name]: event.target.checked });
     console.log(event.target.checked);
-  }
+  };
 
-  onClassChange(subject) {
+  onClassChange = (subject) => {
     const { state } = this;
     this.setState({ subject });
     console.log(`${state.subject} selected`);
-  }
+  };
 
-  onUnitChange(taskDurationUnit) {
+  onUnitChange = (taskDurationUnit) => {
     const { state } = this;
     this.setState({ taskDurationUnit });
     console.log(`${state.subject} selected`);
-  }
+  };
 
-  onTaskTypeChange(taskType) {
+  onTaskTypeChange = (taskType) => {
     const { state } = this;
     this.setState({ taskType });
     console.log(`${state.taskType} selected`);
-  }
+  };
 
-  launchTask() {
+  launchTask = () => {
     const { history } = this.props;
     const { state } = this;
     history.push(`/session/${state.taskName}/${state.taskDescription}`);
-  }
+  };
 
-  saveTask() {
+  saveTask = () => {
     const { state } = this;
     const requestOptions = {
       method: 'POST',
@@ -160,14 +158,21 @@ class TaskEditor extends React.Component {
         description: state.taskDescription,
         type: state.taskType,
         tools: this.tools.map((tool) => tool.id).filter((id) => state[id]),
-        time: state.taskDuration * this.units[state.taskDurationUnit].value,
+        minutes: state.taskDuration,
       }),
     };
-    fetch(
-      'https://localhost:8080/tasks/create',
-      requestOptions,
-    ).then((response) => response.json());
-  }
+    if (state.id === undefined) {
+      fetch(
+        'http://localhost:8080/tasks/create',
+        requestOptions,
+      ).then((response) => console.log(response));
+    } else {
+      fetch(
+        `http://localhost:8080/tasks/${state.id}`,
+        requestOptions,
+      ).then((response) => response.json());
+    }
+  };
 
   render() {
     const { taskDescription, taskName, taskDuration } = this.state;

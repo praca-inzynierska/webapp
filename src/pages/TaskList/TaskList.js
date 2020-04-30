@@ -15,7 +15,7 @@ class TaskList extends React.Component {
           description: 'Opis zadania 1', // to chyba niepotrzebne
           type: 'test',
           tools: ['whiteboard', 'textChat'], // to tez
-          duration: 20,
+          minutes: 20,
         },
         {
           id: 2,
@@ -24,7 +24,7 @@ class TaskList extends React.Component {
           description: 'Opis zadania 1', // to chyba niepotrzebne
           type: 'test',
           tools: ['whiteboard', 'textChat'], // to tez
-          duration: 20,
+          minutes: 20,
         },
         {
           id: 3,
@@ -33,7 +33,7 @@ class TaskList extends React.Component {
           description: 'Opis zadania 1', // to chyba niepotrzebne
           type: 'test',
           tools: ['whiteboard', 'textChat'], // to tez
-          duration: 20,
+          minutes: 20,
         },
         {
           id: 4,
@@ -42,7 +42,7 @@ class TaskList extends React.Component {
           description: 'Opis zadania 1', // to chyba niepotrzebne
           type: 'test',
           tools: ['whiteboard', 'textChat'], // to tez
-          duration: 20,
+          minutes: 20,
         },
       ],
     };
@@ -51,10 +51,12 @@ class TaskList extends React.Component {
   componentDidMount() {
     const requestOptions = {
       method: 'GET',
-      headers: { Username: 'user' },
     };
-    fetch('https://localhost:8080/tasks', requestOptions)
-      .then((response) => response.json())
+    fetch('http://localhost:8080/tasks', requestOptions)
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
       .then((data) => this.setState({ data }));
   }
 
@@ -98,10 +100,12 @@ class TaskList extends React.Component {
             <tbody>
               {state.data.map((task) => (
                 <tr>
-                  <td>{task.name}</td>
+                  <td>
+                    {task.id} {task.name}
+                  </td>
                   <td>{task.subject}</td>
                   <td>{task.type}</td>
-                  <td>{task.duration}</td>
+                  <td>{task.minutes} minutes</td>
                   <td>
                     <Button color="info" onClick={() => this.editTask(task.id)}>
                       Edit
@@ -113,8 +117,8 @@ class TaskList extends React.Component {
           </Table>
         </Box>
         <Box>
-          <Button color="success" onClick={() => this.createTask}>
-            Edit
+          <Button color="success" onClick={this.createTask}>
+            Add new task
           </Button>
         </Box>
       </div>

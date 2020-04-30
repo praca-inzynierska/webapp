@@ -15,7 +15,7 @@ function App() {
       component: TaskList,
     },
     {
-      path: '/task/:id',
+      path: '/task/:taskId',
       component: TaskEditor,
     },
     {
