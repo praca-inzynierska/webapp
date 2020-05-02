@@ -1,14 +1,14 @@
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import Navbar from 'react-bulma-components/lib/components/navbar';
-import React from 'react';
-import Content from 'react-bulma-components/lib/components/container';
-import TaskEditor from './pages/TaskEditor/TaskEditor';
-import './App.css';
-import 'react-bulma-components/dist/react-bulma-components.min.css';
-import TaskSession from './pages/TaskSession/TaskSession';
-import TaskList from './pages/TaskList/TaskList';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import Navbar from 'react-bulma-components/lib/components/navbar'
+import React from 'react'
+import Content from 'react-bulma-components/lib/components/container'
+import TaskEditor from './pages/TaskEditor/TaskEditor'
+import './App.css'
+import 'react-bulma-components/dist/react-bulma-components.min.css'
+import TaskSession from './pages/TaskSession/TaskSession'
+import TaskList from './pages/TaskList/TaskList'
 
-function App() {
+function App () {
   const routes = [
     {
       path: '/tasks',
@@ -26,7 +26,7 @@ function App() {
       path: '/session/:taskName/:taskDescription',
       component: TaskSession,
     },
-  ];
+  ]
 
   return (
     <Router>
@@ -52,20 +52,20 @@ function App() {
         </Content>
       </div>
     </Router>
-  );
+  )
 
-  function RouteWithSubRoutes(route) {
+  function RouteWithSubRoutes (route) {
     return (
       <Route
         path={route.path}
         render={(props) => (
           // pass the sub-routes down to keep nesting
           // eslint-disable-next-line react/jsx-props-no-spreading
-          <route.component {...props} routes={route.routes} />
+          <route.component {...props} routes={route.routes}/>
         )}
       />
-    );
+    )
   }
 }
 
-export default App;
+export default App

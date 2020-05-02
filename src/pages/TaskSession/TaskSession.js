@@ -1,25 +1,25 @@
-import React from 'react';
-import { withRouter } from 'react-router';
-import '../../index.css';
-import 'react-bulma-components/dist/react-bulma-components.min.css';
-import './TaskSession.css';
+import React from 'react'
+import { withRouter } from 'react-router'
+import '../../index.css'
+import 'react-bulma-components/dist/react-bulma-components.min.css'
+import './TaskSession.css'
 
-import Iframe from 'react-iframe';
-import { Hero } from 'react-bulma-components/lib';
-import { Container, Heading } from 'react-bulma-components';
+import Iframe from 'react-iframe'
+import { Hero } from 'react-bulma-components/lib'
+import { Container, Heading } from 'react-bulma-components'
 
 class TaskSession extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
       taskDescription: 'abc',
       taskName: 'Zadanie',
-    };
+    }
   }
 
-  render() {
-    const { match } = this.props;
-    const { taskDescription, taskName } = match.params;
+  render () {
+    const { match } = this.props
+    const { taskDescription, taskName } = match.params
     return (
       <div className="task">
         <Hero color="primary">
@@ -38,8 +38,8 @@ class TaskSession extends React.Component {
           height="50%"
         />
       </div>
-    );
+    )
   }
 }
 
-export default withRouter(TaskSession);
+export default withRouter(TaskSession)

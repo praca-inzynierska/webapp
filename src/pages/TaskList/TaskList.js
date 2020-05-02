@@ -1,11 +1,13 @@
-import React from 'react';
-import { withRouter } from 'react-router';
-import '../../index.css';
-import { Button, Heading, Table, Box } from 'react-bulma-components';
+import React from 'react'
+import { withRouter } from 'react-router'
+import '../../index.css'
+import { Button, Heading, Table, Box } from 'react-bulma-components'
 
 class TaskList extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
+    this.editTask = this.editTask.bind(this)
+    this.createTask = this.createTask.bind(this)
     this.state = {
       data: [
         {
@@ -45,33 +47,33 @@ class TaskList extends React.Component {
           minutes: 20,
         },
       ],
-    };
+    }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const requestOptions = {
       method: 'GET',
-    };
+    }
     fetch('http://localhost:8080/tasks', requestOptions)
       .then((response) => {
-        console.log(response);
-        return response.json();
+        console.log(response)
+        return response.json()
       })
-      .then((data) => this.setState({ data }));
+      .then((data) => this.setState({ data }))
   }
 
-  editTask(id) {
-    const { history } = this.props;
-    history.push(`/task/${id}`);
+  editTask (id) {
+    const { history } = this.props
+    history.push(`/task/${id}`)
   }
 
-  createTask() {
-    const { history } = this.props;
-    history.push(`/task/`);
+  createTask () {
+    const { history } = this.props
+    history.push('/task/')
   }
 
-  render() {
-    const { state } = this;
+  render () {
+    const { state } = this
     return (
       <div className="mainBox">
         <Box>
@@ -98,8 +100,8 @@ class TaskList extends React.Component {
               </tr>
             </tfoot>
             <tbody>
-              {state.data.map((task) => (
-                <tr>
+              {state.data.map((task, key) => (
+                <tr key={key}>
                   <td>
                     {task.id} {task.name}
                   </td>
@@ -108,7 +110,7 @@ class TaskList extends React.Component {
                   <td>{task.minutes} minutes</td>
                   <td>
                     <Button color="info" onClick={() => this.editTask(task.id)}>
-                      Edit
+                    Edit
                     </Button>
                   </td>
                 </tr>
@@ -122,8 +124,8 @@ class TaskList extends React.Component {
           </Button>
         </Box>
       </div>
-    );
+    )
   }
 }
 
-export default withRouter(TaskList);
+export default withRouter(TaskList)
