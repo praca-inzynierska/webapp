@@ -133,7 +133,7 @@ class TaskEditor extends React.Component<TParams> {
       body: Task.serialize(editedTask),
     }
 
-    if (id === undefined) {
+    if (id === null) {
       fetch(
         'http://localhost:8080/tasks/create',
         requestOptions,
@@ -144,6 +144,7 @@ class TaskEditor extends React.Component<TParams> {
         requestOptions,
       ).then((response) => response.json())
     }
+    this.props.history.push('/tasks/')
   }
 
   render () {

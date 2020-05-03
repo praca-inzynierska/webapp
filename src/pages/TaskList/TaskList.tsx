@@ -1,17 +1,24 @@
-import React from 'react'
+import React, { ComponentProps } from 'react'
 import { withRouter } from 'react-router'
 import '../../index.css'
 import { Button, Heading, Table, Box } from 'react-bulma-components'
+import { Task } from '../../model/Task'
 
-class TaskList extends React.Component {
-  constructor (props) {
+type TState = {
+  [key: string]: any;
+  data: Task[]
+};
+
+class TaskList extends React.Component<ComponentProps<any>> {
+  readonly state: TState
+  constructor (props: any) {
     super(props)
     this.editTask = this.editTask.bind(this)
     this.createTask = this.createTask.bind(this)
     this.state = {
       data: [
         {
-          id: 1,
+          id: '1',
           subject: 'Matematyka',
           name: 'Zadanie 1',
           description: 'Opis zadania 1', // to chyba niepotrzebne
@@ -20,7 +27,7 @@ class TaskList extends React.Component {
           minutes: 20,
         },
         {
-          id: 2,
+          id: '1',
           subject: 'Matematyka',
           name: 'Zadanie 1',
           description: 'Opis zadania 1', // to chyba niepotrzebne
@@ -46,7 +53,7 @@ class TaskList extends React.Component {
           tools: ['whiteboard', 'textChat'], // to tez
           minutes: 20,
         },
-      ],
+      ].map(taskResponseMock => Task.fromResponse(taskResponseMock))
     }
   }
 
@@ -62,7 +69,7 @@ class TaskList extends React.Component {
       .then((data) => this.setState({ data }))
   }
 
-  editTask (id) {
+  editTask (id: string | null) {
     const { history } = this.props
     history.push(`/task/${id}`)
   }

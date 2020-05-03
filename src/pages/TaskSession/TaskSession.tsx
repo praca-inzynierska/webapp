@@ -1,15 +1,14 @@
-import React from 'react'
+import React, { ComponentProps } from 'react'
 import { withRouter } from 'react-router'
 import '../../index.css'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
 import './TaskSession.css'
 
 import Iframe from 'react-iframe'
-import { Hero } from 'react-bulma-components/lib'
-import { Container, Heading } from 'react-bulma-components'
+import { Container, Heading, Hero } from 'react-bulma-components'
 
-class TaskSession extends React.Component {
-  constructor (props) {
+class TaskSession extends React.Component<ComponentProps<any>> {
+  constructor (props: any) {
     super(props)
     this.state = {
       taskDescription: 'abc',

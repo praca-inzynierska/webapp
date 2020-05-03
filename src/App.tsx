@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import Navbar from 'react-bulma-components/lib/components/navbar'
+import { Navbar, Container } from 'react-bulma-components'
 import React from 'react'
-import Content from 'react-bulma-components/lib/components/container'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
@@ -42,19 +41,18 @@ function App () {
             </Navbar.Container>
           </Navbar.Menu>
         </Navbar>
-        <Content>
+        <Container>
           <Switch>
             {routes.map((route, i) => (
-              // eslint-disable-next-line react/no-array-index-key,react/jsx-props-no-spreading
               <RouteWithSubRoutes key={i} {...route} />
             ))}
           </Switch>
-        </Content>
+        </Container>
       </div>
     </Router>
   )
 
-  function RouteWithSubRoutes (route) {
+  function RouteWithSubRoutes (route: any) {
     return (
       <Route
         path={route.path}
