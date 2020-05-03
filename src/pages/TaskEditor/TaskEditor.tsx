@@ -13,10 +13,11 @@ import {
 } from 'react-bulma-components/lib/components/form'
 import { Box, Heading, Dropdown, Button } from 'react-bulma-components'
 import Subject from '../../model/Subject'
-import Task, { TaskType, TimeUnit, Tool } from '../../model/Task'
+import { Task, TaskType, TimeUnit, Tool } from '../../model/Task'
 
 type TParams = RouteComponentProps<TParams> & { taskId: string };
 type TState = {
+  [key: string]: any;
   taskId: string,
   editedTask: Task,
   taskDurationUnit: TimeUnit
@@ -65,23 +66,32 @@ class TaskEditor extends React.Component<TParams> {
     }
   }
 
+  private deepSetState (editedProperty: string, editedNestedProperty: string, newValue: any) {
+    this.setState((prevState: TState) => {
+      type editedPropertyType = typeof prevState[typeof editedProperty]
+      const editedPropertyValue = { ...prevState[editedProperty] }
+      editedPropertyValue[editedNestedProperty] = newValue
+      return { [editedProperty]: editedPropertyValue }
+    })
+  }
+
   componentDidMount () {
     const requestOptions = {
       method: 'GET',
     }
-    if (this.state.taskId !== null) {
-      fetch(`http://localhost:8080/tasks/${this.state.editedTask.id}`, requestOptions)
+    if (this.state.taskId !== undefined) {
+      fetch(`http://localhost:8080/tasks/${this.state.taskId}`, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           this.setState({
-            editedTask: data,
+            editedTask: Task.fromResponse(data),
           })
         })
     }
   }
 
   onTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ [event.target.name]: event.target.value })
+    this.deepSetState('editedTask', event.target.name, event.target.value)
     console.log(event.target.value)
   }
 
@@ -92,23 +102,19 @@ class TaskEditor extends React.Component<TParams> {
 
   onClassChange = (subject: string) => {
     const { state } = this
-    this.setState((prevState: TState) => {
-      const editedTask = { ...prevState.editedTask }
-      editedTask.subject = subject
-      return { editedTask }
-    })
+    this.deepSetState('editedTask', 'subject', subject)
     console.log(`${state.editedTask.subject} selected`)
   }
 
-  onUnitChange = (taskDurationUnit: React.ChangeEvent<HTMLInputElement>) => {
+  onUnitChange = (taskDurationUnit: string) => {
     const { state } = this
-    this.setState({ taskDurationUnit })
+    this.setState({ taskDurationUnit: this.units.findByKey('id', taskDurationUnit) })
     console.log(`${state.editedTask.subject} selected`)
   }
 
-  onTaskTypeChange = (taskType: React.ChangeEvent<HTMLInputElement>) => {
+  onTaskTypeChange = (taskType: string) => {
     const { state } = this
-    this.setState({ taskType })
+    this.deepSetState('editedTask', 'type', taskType)
     console.log(`${state.editedTask.type} selected`)
   }
 
@@ -119,16 +125,12 @@ class TaskEditor extends React.Component<TParams> {
   }
 
   saveTask = () => {
-    const editedTask = this.state.editedTask
+    const editedTask: Task = this.state.editedTask
     const id = editedTask.id
-    const replacer = (key: string, value: any) => {
-      if (key === 'id') return undefined
-      else return value
-    }
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editedTask, replacer),
+      body: Task.serialize(editedTask),
     }
 
     if (id === undefined) {
@@ -157,7 +159,7 @@ class TaskEditor extends React.Component<TParams> {
           <Control>
             <Input
               onChange={this.onTitleChange}
-              name="taskName"
+              name="name"
               placeholder="Wpisz tytuł zadania"
               value={name}
             />
@@ -167,7 +169,7 @@ class TaskEditor extends React.Component<TParams> {
           <Label>Przedmiot</Label>
           <Control>
             <Dropdown
-              name="className"
+              name="subject"
               onChange={this.onClassChange}
               label={
                 state.editedTask.subject === ''
@@ -188,7 +190,7 @@ class TaskEditor extends React.Component<TParams> {
           <Control>
             <Textarea
               onChange={this.onTitleChange}
-              name="taskDescription"
+              name="description"
               placeholder="Wpisz opis zadania"
               value={description}
             />
@@ -200,7 +202,7 @@ class TaskEditor extends React.Component<TParams> {
             <Input
               type="number"
               onChange={this.onTitleChange}
-              name="taskDuration"
+              name="minutes"
               value={minutes}
             />
             <Dropdown
@@ -246,7 +248,7 @@ class TaskEditor extends React.Component<TParams> {
           <Label>Forma odpowiedzi</Label>
           <Control>
             <Dropdown
-              name="taskType"
+              name="type"
               onChange={this.onTaskTypeChange}
               label={
                 state.editedTask.type !== ''

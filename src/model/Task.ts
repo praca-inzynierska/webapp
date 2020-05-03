@@ -1,4 +1,4 @@
-export default class Task {
+export class Task {
   id: string | null
   name: string
   description: string
@@ -19,14 +19,24 @@ export default class Task {
     this.tools = tools
   }
 
-  public static emptyTask () {
+  public static fromResponse (response: any): Task {
+    const tools = new Map()
+    response.tools.forEach((tool: string) => tools.set(tool, true))
+    return new Task(response.id, response.name, response.description, response.subject, response.type, response.minutes, tools)
+  }
+
+  public static emptyTask (): Task {
     return new Task(null, '', '', 'matematyka', 'whiteboard', 0, new Map())
   }
 
-  public serialize (): string {
-    return JSON.stringify(this, (key, value: Map<string, boolean>) => {
-      if (key === 'tools') return Object.keys(value).filter(key => value.get(key))
-    })
+  public static serialize (task: Task): string {
+    const replacer = (key: string, value: any) => {
+      if (key === 'tools') return [...value.keys()].filter(key => value.get(key))
+      if (key === 'id') return undefined
+      return value
+    }
+    const value = JSON.stringify(task, replacer)
+    return value
   }
 }
 
