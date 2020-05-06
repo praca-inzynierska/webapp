@@ -3,6 +3,7 @@ import { withRouter } from 'react-router'
 import '../../index.css'
 import { Button, Heading, Table, Box } from 'react-bulma-components'
 import { Task } from '../../model/Task'
+import api from '../../util/api'
 
 type TState = {
   [key: string]: any;
@@ -58,14 +59,8 @@ class TaskList extends React.Component<ComponentProps<any>> {
   }
 
   componentDidMount () {
-    const requestOptions = {
-      method: 'GET',
-    }
-    fetch('http://localhost:8080/tasks', requestOptions)
-      .then((response) => {
-        console.log(response)
-        return response.json()
-      })
+    api.get('/tasks')
+      .then((response) => response.data)
       .then((data) => this.setState({ data }))
   }
 
@@ -117,7 +112,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
                   <td>{task.minutes} minutes</td>
                   <td>
                     <Button color="info" onClick={() => this.editTask(task.id)}>
-                    Edit
+                      Edit
                     </Button>
                   </td>
                 </tr>

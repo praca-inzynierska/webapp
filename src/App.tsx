@@ -6,6 +6,7 @@ import './App.css'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
 import TaskSession from './pages/TaskSession/TaskSession'
 import TaskList from './pages/TaskList/TaskList'
+import Login from './pages/Login/Login'
 
 function App () {
   const routes = [
@@ -25,6 +26,10 @@ function App () {
       path: '/session/:taskName/:taskDescription',
       component: TaskSession,
     },
+    {
+      path: '/login',
+      component: Login,
+    },
   ]
 
   return (
@@ -37,7 +42,7 @@ function App () {
               <Navbar.Item href="/tasks">Tasks</Navbar.Item>
             </Navbar.Container>
             <Navbar.Container position="end">
-              <Navbar.Item href="/about">About</Navbar.Item>
+              <Navbar.Item href="/login">Login</Navbar.Item>
             </Navbar.Container>
           </Navbar.Menu>
         </Navbar>

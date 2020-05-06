@@ -2,6 +2,7 @@ import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router'
 import '../../index.css'
 import '../../util/Utils'
+import api from '../../util/api'
 
 import {
   Checkbox,
@@ -76,12 +77,9 @@ class TaskEditor extends React.Component<TParams> {
   }
 
   componentDidMount () {
-    const requestOptions = {
-      method: 'GET',
-    }
     if (this.state.taskId !== undefined) {
-      fetch(`http://localhost:8080/tasks/${this.state.taskId}`, requestOptions)
-        .then((response) => response.json())
+      api.get(`/tasks/${this.state.taskId}`)
+        .then((response) => response.data)
         .then((data) => {
           this.setState({
             editedTask: Task.fromResponse(data),
@@ -127,22 +125,12 @@ class TaskEditor extends React.Component<TParams> {
   saveTask = () => {
     const editedTask: Task = this.state.editedTask
     const id = editedTask.id
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: Task.serialize(editedTask),
-    }
+    const body = Task.serialize(editedTask)
 
     if (id === null) {
-      fetch(
-        'http://localhost:8080/tasks/create',
-        requestOptions,
-      ).then((response) => console.log(response))
+      api.post('/tasks/create', body)
     } else {
-      fetch(
-        `http://localhost:8080/tasks/${id}`,
-        requestOptions,
-      ).then((response) => response.json())
+      api.post(`/tasks/create/${id}`, body)
     }
     this.props.history.push('/tasks/')
   }
