@@ -7,8 +7,10 @@ import 'react-bulma-components/dist/react-bulma-components.min.css'
 import TaskSession from './pages/TaskSession/TaskSession'
 import TaskList from './pages/TaskList/TaskList'
 import Login from './pages/Login/Login'
+import { connect } from 'react-redux'
+import { logout } from './actions'
 
-function App () {
+function App ({ username, logout }: any) {
   const routes = [
     {
       path: '/tasks',
@@ -42,7 +44,10 @@ function App () {
               <Navbar.Item href="/tasks">Tasks</Navbar.Item>
             </Navbar.Container>
             <Navbar.Container position="end">
-              <Navbar.Item href="/login">Login</Navbar.Item>
+              {(username === undefined)
+                ? <Navbar.Item href="/login">Login</Navbar.Item>
+                : <Navbar.Item href="/login" onClick={logout}>{username} Logout</Navbar.Item>
+              }
             </Navbar.Container>
           </Navbar.Menu>
         </Navbar>
@@ -71,4 +76,13 @@ function App () {
   }
 }
 
-export default App
+const mapStateToProps = (state: any) => ({
+  username: state.auth.username
+})
+
+const component = connect(
+  mapStateToProps,
+  { logout }
+)(App)
+
+export default component

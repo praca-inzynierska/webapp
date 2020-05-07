@@ -3,9 +3,11 @@ import api from '../../util/api'
 import { Box, Button, Heading } from 'react-bulma-components'
 import { withRouter } from 'react-router'
 import { Control, Field, Input, Label } from 'react-bulma-components/lib/components/form'
+import { connect } from 'react-redux'
+import { login } from '../../actions'
 
 type TState = {
-  login: string,
+  username: string,
   password: string
 }
 
@@ -15,20 +17,21 @@ class Login extends React.Component<ComponentProps<any>> {
   constructor (props: any) {
     super(props)
     this.onInputChange = this.onInputChange.bind(this)
-    this.login = this.login.bind(this)
+    this.handleLogin = this.handleLogin.bind(this)
 
     this.state = {
-      login: '',
+      username: '',
       password: ''
     }
   }
 
-  login () {
+  handleLogin () {
     const data = this.state
     api.post('/login', data)
       .then((response) => {
         const { history } = this.props
         api.defaults.headers.Token = response.data.token
+        this.props.login(response.data.token)
         history.push('/tasks')
       })
       .catch(e => console.log(e))
@@ -51,9 +54,9 @@ class Login extends React.Component<ComponentProps<any>> {
             <Control>
               <Input
                 onChange={this.onInputChange}
-                name="login"
+                name="username"
                 placeholder="Login"
-                value={state.login}
+                value={state.username}
               />
             </Control>
           </Field>
@@ -71,7 +74,7 @@ class Login extends React.Component<ComponentProps<any>> {
           </Field>
         </Box>
         <Box>
-          <Button color="success" onClick={this.login}>
+          <Button color="success" onClick={this.handleLogin}>
             Zaloguj
           </Button>
         </Box>
@@ -80,4 +83,13 @@ class Login extends React.Component<ComponentProps<any>> {
   }
 }
 
-export default withRouter(Login)
+const actionCreators = {
+  login: login
+}
+
+const component = connect(
+  null,
+  actionCreators
+)(Login)
+
+export default withRouter(component)
