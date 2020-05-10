@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import { Navbar, Container } from 'react-bulma-components'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { Container, Navbar } from 'react-bulma-components'
 import React from 'react'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
@@ -9,6 +9,7 @@ import TaskList from './pages/TaskList/TaskList'
 import Login from './pages/Login/Login'
 import { connect } from 'react-redux'
 import { logout } from './actions'
+import SessionCreator from './pages/SessionCreator/SessionCreator'
 
 function App ({ username, logout }: any) {
   const routes = [
@@ -23,6 +24,10 @@ function App ({ username, logout }: any) {
     {
       path: '/task/',
       component: TaskEditor,
+    },
+    {
+      path: '/sessionCreator',
+      component: SessionCreator,
     },
     {
       path: '/session/:taskName/:taskDescription',
@@ -42,6 +47,7 @@ function App ({ username, logout }: any) {
             <Navbar.Container>
               <Navbar.Item href="/">Home</Navbar.Item>
               <Navbar.Item href="/tasks">Tasks</Navbar.Item>
+              <Navbar.Item href="/sessionCreator">Session Creator</Navbar.Item>
             </Navbar.Container>
             <Navbar.Container position="end">
               {(username === undefined)

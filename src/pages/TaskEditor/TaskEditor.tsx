@@ -1,7 +1,7 @@
 import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router'
 import '../../index.css'
-import '../../util/Utils'
+import '../../util/utils'
 import api from '../../util/api'
 
 import {
@@ -126,9 +126,13 @@ class TaskEditor extends React.Component<TParams> {
     const editedTask: Task = this.state.editedTask
     const id = editedTask.id
     const body = Task.serialize(editedTask)
-
+    const headers = {
+      'Content-Type': 'application/json',
+    }
     if (id === null) {
-      api.post('/tasks/create', body)
+      api.post('/tasks/create', body, {
+        headers: headers
+      })
     } else {
       api.post(`/tasks/create/${id}`, body)
     }
