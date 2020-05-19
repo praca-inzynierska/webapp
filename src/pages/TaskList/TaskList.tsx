@@ -7,7 +7,7 @@ import api from '../../util/api'
 
 type TState = {
   [key: string]: any;
-  data: Task[]
+  tasks: Task[]
 };
 
 class TaskList extends React.Component<ComponentProps<any>> {
@@ -17,7 +17,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
     this.editTask = this.editTask.bind(this)
     this.createTask = this.createTask.bind(this)
     this.state = {
-      data: [
+      tasks: [
         {
           id: '1',
           subject: 'Matematyka',
@@ -61,7 +61,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
   componentDidMount () {
     api.get('/tasks')
       .then((response) => response.data)
-      .then((data) => this.setState({ data }))
+      .then((tasks) => this.setState({ tasks }))
   }
 
   editTask (id: string | null) {
@@ -102,7 +102,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
               </tr>
             </tfoot>
             <tbody>
-              {state.data.map((task, key) => (
+              {state.tasks.map((task, key) => (
                 <tr key={key}>
                   <td>
                     {task.id} {task.name}

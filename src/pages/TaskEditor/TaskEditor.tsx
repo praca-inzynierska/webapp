@@ -16,7 +16,7 @@ import { Box, Heading, Dropdown, Button } from 'react-bulma-components'
 import Subject from '../../model/Subject'
 import { Task, TaskType, TimeUnit, Tool } from '../../model/Task'
 
-type TParams = RouteComponentProps<TParams> & { taskId: string };
+type TProps = RouteComponentProps<TProps> & { taskId: string };
 type TState = {
   [key: string]: any;
   taskId: string,
@@ -24,7 +24,7 @@ type TState = {
   taskDurationUnit: TimeUnit
 };
 
-class TaskEditor extends React.Component<TParams> {
+class TaskEditor extends React.Component<TProps> {
   private subjects: Subject[]
   private units: TimeUnit[]
   private taskTypes: TaskType[]
