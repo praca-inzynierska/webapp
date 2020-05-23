@@ -1,15 +1,25 @@
-import React from 'react';
-import { withRouter } from 'react-router';
-import '../../index.css';
-import { Button, Heading, Table, Box } from 'react-bulma-components';
+import React, { ComponentProps } from 'react'
+import { withRouter } from 'react-router'
+import '../../index.css'
+import { Button, Heading, Table, Box } from 'react-bulma-components'
+import { Task } from '../../model/Task'
+import api from '../../util/api'
 
-class TaskList extends React.Component {
-  constructor(props) {
-    super(props);
+type TState = {
+  [key: string]: any;
+  tasks: Task[]
+};
+
+class TaskList extends React.Component<ComponentProps<any>> {
+  readonly state: TState
+  constructor (props: any) {
+    super(props)
+    this.editTask = this.editTask.bind(this)
+    this.createTask = this.createTask.bind(this)
     this.state = {
-      data: [
+      tasks: [
         {
-          id: 1,
+          id: '1',
           subject: 'Matematyka',
           name: 'Zadanie 1',
           description: 'Opis zadania 1', // to chyba niepotrzebne
@@ -18,7 +28,7 @@ class TaskList extends React.Component {
           minutes: 20,
         },
         {
-          id: 2,
+          id: '1',
           subject: 'Matematyka',
           name: 'Zadanie 1',
           description: 'Opis zadania 1', // to chyba niepotrzebne
@@ -44,34 +54,28 @@ class TaskList extends React.Component {
           tools: ['whiteboard', 'textChat'], // to tez
           minutes: 20,
         },
-      ],
-    };
+      ].map(taskResponseMock => Task.fromResponse(taskResponseMock))
+    }
   }
 
-  componentDidMount() {
-    const requestOptions = {
-      method: 'GET',
-    };
-    fetch('http://localhost:8080/tasks', requestOptions)
-      .then((response) => {
-        console.log(response);
-        return response.json();
-      })
-      .then((data) => this.setState({ data }));
+  componentDidMount () {
+    api.get('/tasks')
+      .then((response) => response.data)
+      .then((tasks) => this.setState({ tasks }))
   }
 
-  editTask(id) {
-    const { history } = this.props;
-    history.push(`/task/${id}`);
+  editTask (id: string | null) {
+    const { history } = this.props
+    history.push(`/task/${id}`)
   }
 
-  createTask() {
-    const { history } = this.props;
-    history.push(`/task/`);
+  createTask () {
+    const { history } = this.props
+    history.push('/task/')
   }
 
-  render() {
-    const { state } = this;
+  render () {
+    const { state } = this
     return (
       <div className="mainBox">
         <Box>
@@ -98,8 +102,8 @@ class TaskList extends React.Component {
               </tr>
             </tfoot>
             <tbody>
-              {state.data.map((task) => (
-                <tr>
+              {state.tasks.map((task, key) => (
+                <tr key={key}>
                   <td>
                     {task.id} {task.name}
                   </td>
@@ -122,8 +126,8 @@ class TaskList extends React.Component {
           </Button>
         </Box>
       </div>
-    );
+    )
   }
 }
 
-export default withRouter(TaskList);
+export default withRouter(TaskList)
