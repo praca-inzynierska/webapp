@@ -9,7 +9,7 @@ import TaskList from './pages/TaskList/TaskList'
 import Login from './pages/Login/Login'
 import { connect } from 'react-redux'
 import { logout } from './actions'
-import SessionCreator from './pages/SessionCreator/SessionCreator'
+import ClassSession from './pages/ClassSession/ClassSession'
 
 function App ({ username, logout }: any) {
   const routes = [
@@ -26,8 +26,8 @@ function App ({ username, logout }: any) {
       component: TaskEditor,
     },
     {
-      path: '/sessionCreator',
-      component: SessionCreator,
+      path: '/class',
+      component: ClassSession,
     },
     {
       path: '/session/:taskName/:taskDescription',
@@ -47,7 +47,7 @@ function App ({ username, logout }: any) {
             <Navbar.Container>
               <Navbar.Item href="/">Home</Navbar.Item>
               <Navbar.Item href="/tasks">Tasks</Navbar.Item>
-              <Navbar.Item href="/sessionCreator">Session Creator</Navbar.Item>
+              <Navbar.Item href="/class">Session Creator</Navbar.Item>
             </Navbar.Container>
             <Navbar.Container position="end">
               {(username === undefined)

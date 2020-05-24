@@ -1,4 +1,4 @@
-import { Card, Content, Media } from 'react-bulma-components'
+import { Card } from 'react-bulma-components'
 import React, { ComponentProps } from 'react'
 import './StudentCard.css'
 import Student from '../../model/Student'
@@ -25,12 +25,8 @@ class StudentCard extends React.Component<ComponentProps<any>> {
         <Card className={this.props.selected ? 'selected' : null}>
           <Card.Image src="http://bulma.io/images/placeholders/1280x960.png"/>
           <Card.Content>
-            <Media>
-              <Media.Item>
-                <Content>{this.props.student.name}</Content>
-                <Content>{this.props.student.school}</Content>
-              </Media.Item>
-            </Media>
+            <div>{this.props.student.name}</div>
+            <div>{this.props.student.school}</div>
           </Card.Content>
         </Card>
       </div>
