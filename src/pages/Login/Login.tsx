@@ -1,6 +1,6 @@
 import React, { ComponentProps } from 'react'
 import api from '../../util/api'
-import { Box, Button, Tabs } from 'react-bulma-components'
+import { Box, Button, Tabs, Container } from 'react-bulma-components'
 import { withRouter } from 'react-router'
 import { Checkbox, Control, Field, Input, Label } from 'react-bulma-components/lib/components/form'
 import { connect } from 'react-redux'
@@ -62,71 +62,73 @@ class Login extends React.Component<ComponentProps<any>> {
   render () {
     const { state } = this
     return (
-      <div className="mainBox">
-        <Tabs
-          fullwidth={true}
-        >
-          <Tabs.Tab active={state.isLogin} onClick={() => this.setState({ isLogin: true })}>
+      <div className="page">
+        <Container>
+          <Tabs
+            fullwidth={true}
+          >
+            <Tabs.Tab active={state.isLogin} onClick={() => this.setState({ isLogin: true })}>
             Login
-          </Tabs.Tab>
-          <Tabs.Tab active={!state.isLogin} onClick={() => this.setState({ isLogin: false })}>
+            </Tabs.Tab>
+            <Tabs.Tab active={!state.isLogin} onClick={() => this.setState({ isLogin: false })}>
             Register
-          </Tabs.Tab>
-        </Tabs>
-        <Field>
-          <Label>Login</Label>
-          <Control>
-            <Input
-              onChange={this.onInputChange}
-              name="username"
-              placeholder="Login"
-              value={state.username}
-            />
-          </Control>
-        </Field>
-        <Field>
-          <Label>Hasło</Label>
-          <Control>
-            <Input
-              onChange={this.onInputChange}
-              name="password"
-              placeholder="Hasło"
-              value={state.password}
-              type="password"
-            />
-          </Control>
-        </Field>
-        {!state.isLogin ? (
-          <div>
-            <Field>
-              <Label>Email</Label>
-              <Control>
-                <Input
-                  onChange={this.onInputChange}
-                  name="email"
-                  placeholder="Email"
-                  value={state.email}
-                  type="email"
-                />
-              </Control>
-            </Field>
-            <Field>
-              <Checkbox
-                name="isTeacher"
-                onChange={this.onCheckboxChange}
-                checked={state.isTeacher}
-              >
+            </Tabs.Tab>
+          </Tabs>
+          <Field>
+            <Label>Login</Label>
+            <Control>
+              <Input
+                onChange={this.onInputChange}
+                name="username"
+                placeholder="Login"
+                value={state.username}
+              />
+            </Control>
+          </Field>
+          <Field>
+            <Label>Hasło</Label>
+            <Control>
+              <Input
+                onChange={this.onInputChange}
+                name="password"
+                placeholder="Hasło"
+                value={state.password}
+                type="password"
+              />
+            </Control>
+          </Field>
+          {!state.isLogin ? (
+            <div>
+              <Field>
+                <Label>Email</Label>
+                <Control>
+                  <Input
+                    onChange={this.onInputChange}
+                    name="email"
+                    placeholder="Email"
+                    value={state.email}
+                    type="email"
+                  />
+                </Control>
+              </Field>
+              <Field>
+                <Checkbox
+                  name="isTeacher"
+                  onChange={this.onCheckboxChange}
+                  checked={state.isTeacher}
+                >
                 Nauczyciel
-              </Checkbox>
-            </Field>
-          </div>
-        ) : ''}
+                </Checkbox>
+              </Field>
+            </div>
+          ) : ''}
 
-        <Box>
-          <Button color="success" onClick={this.handleConfirm}>
-            {state.isLogin ? 'Zaloguj' : 'Zarejestruj'}
-          </Button>
-        </Box>
+          <Box>
+            <Button color="success" onClick={this.handleConfirm}>
+              {state.isLogin ? 'Zaloguj' : 'Zarejestruj'}
+            </Button>
+          </Box>
+        </Container>
       </div>
     )
   }

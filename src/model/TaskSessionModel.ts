@@ -25,4 +25,8 @@ export default class TaskSessionModel {
   markAsNeedsHelp () {
     this.needsHelp = true
   }
+
+  static fromResponse (data: any): TaskSessionModel {
+    return new TaskSessionModel(data.students, data.task, data.taskSessionId)
+  }
 }

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Container, Navbar } from 'react-bulma-components'
+import { Navbar } from 'react-bulma-components'
 import React from 'react'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
@@ -41,30 +41,26 @@ function App ({ username, logout }: any) {
 
   return (
     <Router>
-      <div>
-        <Navbar fixed="top">
-          <Navbar.Menu>
-            <Navbar.Container>
-              <Navbar.Item href="/">Home</Navbar.Item>
-              <Navbar.Item href="/tasks">Tasks</Navbar.Item>
-              <Navbar.Item href="/class">Session Creator</Navbar.Item>
-            </Navbar.Container>
-            <Navbar.Container position="end">
-              {(username === undefined)
-                ? <Navbar.Item href="/login">Login</Navbar.Item>
-                : <Navbar.Item href="/login" onClick={logout}>{username} Logout</Navbar.Item>
-              }
-            </Navbar.Container>
-          </Navbar.Menu>
-        </Navbar>
-        <Container>
-          <Switch>
-            {routes.map((route, i) => (
-              <RouteWithSubRoutes key={i} {...route} />
-            ))}
-          </Switch>
-        </Container>
-      </div>
+      <Navbar fixed="top" className="nav-bar">
+        <Navbar.Menu>
+          <Navbar.Container>
+            <Navbar.Item href="/">Home</Navbar.Item>
+            <Navbar.Item href="/tasks">Tasks</Navbar.Item>
+            <Navbar.Item href="/class">Session Creator</Navbar.Item>
+          </Navbar.Container>
+          <Navbar.Container position="end">
+            {(username === undefined)
+              ? <Navbar.Item href="/login">Login</Navbar.Item>
+              : <Navbar.Item href="/login" onClick={logout}>{username} Logout</Navbar.Item>
+            }
+          </Navbar.Container>
+        </Navbar.Menu>
+      </Navbar>
+      <Switch>
+        {routes.map((route, i) => (
+          <RouteWithSubRoutes key={i} {...route} />
+        ))}
+      </Switch>
     </Router>
   )
 

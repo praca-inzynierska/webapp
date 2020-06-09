@@ -1,7 +1,7 @@
 import React, { ComponentProps } from 'react'
 import { withRouter } from 'react-router'
 import '../../index.css'
-import { Button, Heading, Table, Box } from 'react-bulma-components'
+import { Button, Heading, Table, Box, Container } from 'react-bulma-components'
 import { Task } from '../../model/Task'
 import api from '../../util/api'
 
@@ -12,6 +12,7 @@ type TState = {
 
 class TaskList extends React.Component<ComponentProps<any>> {
   readonly state: TState
+
   constructor (props: any) {
     super(props)
     this.editTask = this.editTask.bind(this)
@@ -77,54 +78,56 @@ class TaskList extends React.Component<ComponentProps<any>> {
   render () {
     const { state } = this
     return (
-      <div className="mainBox">
-        <Box>
-          <Heading size={2}>Zadania</Heading>
-        </Box>
-        <Box>
-          <Table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Subject</th>
-                <th>Type</th>
-                <th>Duration</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr>
-                <th>Name</th>
-                <th>Subject</th>
-                <th>Type</th>
-                <th>Duration</th>
-                <th>Actions</th>
-              </tr>
-            </tfoot>
-            <tbody>
-              {state.tasks.map((task, key) => (
-                <tr key={key}>
-                  <td>
-                    {task.id} {task.name}
-                  </td>
-                  <td>{task.subject}</td>
-                  <td>{task.type}</td>
-                  <td>{task.minutes} minutes</td>
-                  <td>
-                    <Button color="info" onClick={() => this.editTask(task.id)}>
-                      Edit
-                    </Button>
-                  </td>
+      <div className="page">
+        <Container>
+          <Box>
+            <Heading size={2}>Zadania</Heading>
+          </Box>
+          <Box>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Subject</th>
+                  <th>Type</th>
+                  <th>Duration</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Box>
-        <Box>
-          <Button color="success" onClick={this.createTask}>
-            Add new task
-          </Button>
-        </Box>
+              </thead>
+              <tfoot>
+                <tr>
+                  <th>Name</th>
+                  <th>Subject</th>
+                  <th>Type</th>
+                  <th>Duration</th>
+                  <th>Actions</th>
+                </tr>
+              </tfoot>
+              <tbody>
+                {state.tasks.map((task, key) => (
+                  <tr key={key}>
+                    <td>
+                      {task.id} {task.name}
+                    </td>
+                    <td>{task.subject}</td>
+                    <td>{task.type}</td>
+                    <td>{task.minutes} minutes</td>
+                    <td>
+                      <Button color="info" onClick={() => this.editTask(task.id)}>
+                      Edit
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Box>
+          <Box>
+            <Button color="success" onClick={this.createTask}>
+              Add new task
+            </Button>
+          </Box>
+        </Container>
       </div>
     )
   }

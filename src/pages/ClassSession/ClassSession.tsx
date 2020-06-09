@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import TaskSessionCreator from './TaskSessionCreator'
 import TaskSessionCard from './TaskSessionCard'
-import { Heading } from 'react-bulma-components'
+import { Heading, Container } from 'react-bulma-components'
 
 type TState = {
   taskSessions: TaskSessionModel[]
@@ -42,7 +42,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
 
   render () {
     return (
-      <div>
+      <Container className="page">
         {this.state.started
           ? <div>
             <Heading>
@@ -62,7 +62,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
             {this.showFilteredTasks(group => !group.finished && !group.needsHelp)}
           </div>
           : <TaskSessionCreator onSessionCreate={this.startSessions}/>}
-      </div>
+      </Container>
     )
   }
 }
