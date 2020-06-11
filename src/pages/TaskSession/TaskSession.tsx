@@ -83,6 +83,7 @@ class TaskSession extends React.Component<TProps> {
           </Columns.Column>
           <Columns.Column size="one-fifth">
             <div className='flex-column'>
+              <Heading size={3}>Termin oddania zadania:</Heading>
               <Heading size={4}>{moment(this.state.taskSession.deadline).locale('pl').fromNow()}</Heading>
               <div>{moment(this.state.taskSession.deadline).locale('pl').format('LLL')}</div>
             </div>

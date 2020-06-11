@@ -44,14 +44,14 @@ function App ({ username, logout }: any) {
       <Navbar fixed="top" className="nav-bar">
         <Navbar.Menu>
           <Navbar.Container>
-            <Navbar.Item href="/">Home</Navbar.Item>
-            <Navbar.Item href="/tasks">Tasks</Navbar.Item>
-            <Navbar.Item href="/class">Session Creator</Navbar.Item>
+            <Navbar.Item href="/">Strona główna</Navbar.Item>
+            <Navbar.Item href="/tasks">Zadania</Navbar.Item>
+            <Navbar.Item href="/class">Kreator sesji zadań</Navbar.Item>
           </Navbar.Container>
           <Navbar.Container position="end">
             {(username === undefined)
-              ? <Navbar.Item href="/login">Login</Navbar.Item>
-              : <Navbar.Item href="/login" onClick={logout}>{username} Logout</Navbar.Item>
+              ? <Navbar.Item href="/login">Zaloguj</Navbar.Item>
+              : <Navbar.Item href="/login" onClick={logout}>{username} Wyloguj</Navbar.Item>
             }
           </Navbar.Container>
         </Navbar.Menu>

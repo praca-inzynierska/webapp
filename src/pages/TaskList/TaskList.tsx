@@ -87,20 +87,20 @@ class TaskList extends React.Component<ComponentProps<any>> {
             <Table>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Subject</th>
-                  <th>Type</th>
-                  <th>Duration</th>
-                  <th>Actions</th>
+                  <th>Tytuł</th>
+                  <th>Przedmiot</th>
+                  <th>Typ</th>
+                  <th>Czas trwania</th>
+                  <th>Działania</th>
                 </tr>
               </thead>
               <tfoot>
                 <tr>
-                  <th>Name</th>
-                  <th>Subject</th>
-                  <th>Type</th>
-                  <th>Duration</th>
-                  <th>Actions</th>
+                  <th>Tytuł</th>
+                  <th>Przedmiot</th>
+                  <th>Typ</th>
+                  <th>Czas trwania</th>
+                  <th>Działania</th>
                 </tr>
               </tfoot>
               <tbody>
@@ -111,10 +111,10 @@ class TaskList extends React.Component<ComponentProps<any>> {
                     </td>
                     <td>{task.subject}</td>
                     <td>{task.type}</td>
-                    <td>{task.minutes} minutes</td>
+                    <td>{task.minutes} minut</td>
                     <td>
                       <Button color="info" onClick={() => this.editTask(task.id)}>
-                      Edit
+                      Edytuj
                       </Button>
                     </td>
                   </tr>
@@ -124,7 +124,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
           </Box>
           <Box>
             <Button color="success" onClick={this.createTask}>
-              Add new task
+              Dodaj nowe zadanie
             </Button>
           </Box>
         </Container>

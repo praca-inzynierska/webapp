@@ -68,10 +68,10 @@ class Login extends React.Component<ComponentProps<any>> {
             fullwidth={true}
           >
             <Tabs.Tab active={state.isLogin} onClick={() => this.setState({ isLogin: true })}>
-            Login
+            Logowanie
             </Tabs.Tab>
             <Tabs.Tab active={!state.isLogin} onClick={() => this.setState({ isLogin: false })}>
-            Register
+            Rejestracja
             </Tabs.Tab>
           </Tabs>
           <Field>
