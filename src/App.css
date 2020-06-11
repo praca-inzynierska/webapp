@@ -9,6 +9,18 @@ html.has-navbar-fixed-top {
     padding-top: 0 !important;
 }
 
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 0;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+}
+
 .nav-bar {
     display: flex;
 }

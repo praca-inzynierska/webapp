@@ -3,18 +3,22 @@ import { withRouter } from 'react-router'
 import '../../index.css'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
 import './TaskSession.css'
-import { Columns, Container, Heading, Hero, Tabs } from 'react-bulma-components'
+import { Columns, Container, Heading, Tabs, Box } from 'react-bulma-components'
 import { toolComponents, ToolModel, ToolType } from '../../model/ToolModel'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import api from '../../util/api'
 import { mockTaskSessions } from '../../util/mock'
+import Student from '../../model/Student'
+import StudentCard from '../ClassSession/StudentCard'
+import moment from 'moment'
+import 'moment/locale/pl'
 
 type TProps = ComponentProps<any> & {
   taskSessionId: string
 }
 
 type TState = {
-  taskSession: TaskSessionModel | null
+  taskSession: TaskSessionModel
   taskTools: ToolModel[]
   communicationTools: ToolModel[]
   selectedTaskTool: ToolModel | null,
@@ -28,7 +32,7 @@ class TaskSession extends React.Component<TProps> {
     this.state = {
       taskTools: ToolModel.taskTools, // TODO: pobieranie narzedzi na podstawie id zadania
       communicationTools: ToolModel.communicationTools,
-      taskSession: null,
+      taskSession: TaskSessionModel.empty(),
       selectedTaskTool: null,
       selectedCommunicationTool: null
     }
@@ -59,22 +63,31 @@ class TaskSession extends React.Component<TProps> {
   }
 
   render () {
-    const { match } = this.props
-    const { taskDescription, taskName } = match.params
     const tag: string = this.state.selectedTaskTool ? this.state.selectedTaskTool.tag : 'Task'
     const TaskToolComponent = toolComponents[tag]
     return (
-      <div className="page">
-        <Hero color="primary">
-          <Hero.Body>
+      <div className="page" >
+        <Columns style={{ display: 'flex', flexGrow: 0 }}>
+          <Columns.Column size="two-fifths">
             <Container>
-              <Heading size={5}>{taskName}</Heading>
-              <Heading subtitle size={5}>
-                {taskDescription}
-              </Heading>
+              <Box>
+                <Heading size={2}>{this.state.taskSession.task.name}</Heading>
+                <Heading subtitle size={5}>
+                  {this.state.taskSession.task.description}
+                </Heading>
+              </Box>
             </Container>
-          </Hero.Body>
-        </Hero>
+          </Columns.Column>
+          <Columns.Column size="two-fifths">
+            {this.state.taskSession?.students.map((student :Student) => (<StudentCard student={student}/>))}
+          </Columns.Column>
+          <Columns.Column size="one-fifth">
+            <div className='flex-column'>
+              <Heading size={4}>{moment(this.state.taskSession.deadline).locale('pl').fromNow()}</Heading>
+              <div>{moment(this.state.taskSession.deadline).locale('pl').format('LLL')}</div>
+            </div>
+          </Columns.Column>
+        </Columns>
         <Columns>
           <Columns.Column size="four-fifths">
             <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>

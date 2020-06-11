@@ -124,7 +124,7 @@ class TaskSessionCreator extends React.Component<TProps> {
 
   render () {
     return (
-      <div>
+      <div className='page'>
         <Level renderAs="nav">
           <Level.Side align="left">
             <Level.Item>
@@ -188,8 +188,8 @@ class TaskSessionCreator extends React.Component<TProps> {
             </Level.Item>
           </Level.Side>
         </Level>
-        <Columns>
-          <Columns.Column size={6}>
+        <Columns >
+          <Columns.Column size={6} className='flex-column'>
             <Heading>
               Uczniowie:
             </Heading>
