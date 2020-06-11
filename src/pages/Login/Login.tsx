@@ -1,6 +1,6 @@
 import React, { ComponentProps } from 'react'
 import api from '../../util/api'
-import { Box, Button, Tabs, Container } from 'react-bulma-components'
+import { Box, Button, Container, Tabs } from 'react-bulma-components'
 import { withRouter } from 'react-router'
 import { Checkbox, Control, Field, Input, Label } from 'react-bulma-components/lib/components/form'
 import { connect } from 'react-redux'
@@ -10,6 +10,8 @@ type TState = {
   username: string,
   password: string,
   email: string,
+  firstName: string,
+  lastName: string,
   isTeacher: boolean,
   isLogin: boolean
 }
@@ -27,6 +29,8 @@ class Login extends React.Component<ComponentProps<any>> {
       username: '',
       password: '',
       email: '',
+      firstName: '',
+      lastName: '',
       isTeacher: true,
       isLogin: true
     }
@@ -35,17 +39,21 @@ class Login extends React.Component<ComponentProps<any>> {
   handleConfirm () {
     const data = {
       username: this.state.username,
-      password: this.state.password,
+      password: this.state.password
     }
     if (!this.state.isLogin) {
-      Object.assign(data, { isTeacher: this.state.isTeacher })
+      Object.assign(data, {
+        isTeacher: this.state.isTeacher,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName
+      })
     }
     const url = this.state.isLogin ? '/login' : '/register'
     api.post(url, data)
       .then((response) => {
         const { history } = this.props
         api.defaults.headers.Token = response.data.token
-        this.props.login(response.data.token)
+        this.props.login(response.data.token, response.data.username)
         history.push('/tasks')
       })
       .catch(e => console.log(e))
@@ -108,6 +116,30 @@ class Login extends React.Component<ComponentProps<any>> {
                     placeholder="Email"
                     value={state.email}
                     type="email"
+                  />
+                </Control>
+              </Field>
+              <Field>
+                <Label>Imię</Label>
+                <Control>
+                  <Input
+                    onChange={this.onInputChange}
+                    name="firstName"
+                    placeholder="Imię"
+                    value={state.firstName}
+                    type="firstName"
+                  />
+                </Control>
+              </Field>
+              <Field>
+                <Label>Nazwisko</Label>
+                <Control>
+                  <Input
+                    onChange={this.onInputChange}
+                    name="lastName"
+                    placeholder="Nazwisko"
+                    value={state.lastName}
+                    type="lastName"
                   />
                 </Control>
               </Field>

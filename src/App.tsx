@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Navbar } from 'react-bulma-components'
+import { Navbar, Tag, Content } from 'react-bulma-components'
 import React from 'react'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
@@ -51,7 +51,7 @@ function App ({ username, logout }: any) {
           <Navbar.Container position="end">
             {(username === undefined)
               ? <Navbar.Item href="/login">Zaloguj</Navbar.Item>
-              : <Navbar.Item href="/login" onClick={logout}>{username} Wyloguj</Navbar.Item>
+              : <Navbar.Item href="/login" onClick={logout}><Tag>{username}</Tag></Navbar.Item>
             }
           </Navbar.Container>
         </Navbar.Menu>
