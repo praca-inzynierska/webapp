@@ -10,15 +10,6 @@ type TProps = {
 }
 
 class StudentCard extends React.Component<ComponentProps<any>> {
-  constructor (props: TProps) {
-    super(props)
-
-    this.state = {
-      username: '',
-      password: ''
-    }
-  }
-
   render () {
     return (
       <div onClick={this.props.selectEvent}>

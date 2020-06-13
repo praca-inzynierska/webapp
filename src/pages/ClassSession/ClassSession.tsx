@@ -4,10 +4,13 @@ import { connect } from 'react-redux'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import TaskSessionCreator from './TaskSessionCreator'
 import TaskSessionCard from './TaskSessionCard'
-import { Heading, Container } from 'react-bulma-components'
+import { Container, Heading } from 'react-bulma-components'
+import ClassSessionModel from '../../model/ClassSessionModel'
+import api from '../../util/api'
+import Student from '../../model/Student'
 
 type TState = {
-  taskSessions: TaskSessionModel[]
+  classSession: ClassSessionModel
   started: boolean
 }
 
@@ -20,8 +23,13 @@ class ClassSession extends React.Component<ComponentProps<any>> {
 
     this.state = {
       started: false,
-      taskSessions: []
+      classSession: ClassSessionModel.empty()
     }
+  }
+
+  componentDidMount () {
+    api.get(`classSessions/${this.props.match.params.id}`)
+      .then(response => this.setState({ classSession: ClassSessionModel.fromResponse(response.data) }))
   }
 
   startSessions (taskSessions: TaskSessionModel[]) {
@@ -30,7 +38,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
 
   showFilteredTasks (func: (group: TaskSessionModel) => boolean) {
     return (
-      this.state.taskSessions
+      (this.state.classSession.taskSessions as TaskSessionModel[])
         .filter(func)
         .map((group: TaskSessionModel, index: number) => (
           <div key={index}>
@@ -61,7 +69,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
             </Heading>
             {this.showFilteredTasks(group => !group.finished && !group.needsHelp)}
           </div>
-          : <TaskSessionCreator onSessionCreate={this.startSessions}/>}
+          : <TaskSessionCreator students={(this.state.classSession.students as Student[])} onSessionCreate={this.startSessions}/>}
       </Container>
     )
   }

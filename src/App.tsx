@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Navbar, Tag, Content } from 'react-bulma-components'
+import { Navbar, Tag } from 'react-bulma-components'
 import React from 'react'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
@@ -10,6 +10,8 @@ import Login from './pages/Login/Login'
 import { connect } from 'react-redux'
 import { logout } from './actions'
 import ClassSession from './pages/ClassSession/ClassSession'
+import HomePage from './pages/HomePage/HomePage'
+import ClassSessionCreator from './pages/ClassSessionCreator/ClassSessionCreator'
 
 function App ({ username, logout }: any) {
   const routes = [
@@ -26,8 +28,12 @@ function App ({ username, logout }: any) {
       component: TaskEditor,
     },
     {
-      path: '/class',
-      component: ClassSession,
+      path: '/classSession/new',
+      component: ClassSessionCreator
+    },
+    {
+      path: '/classSession/:id',
+      component: ClassSession
     },
     {
       path: '/session/:taskName/:taskDescription',
@@ -36,6 +42,10 @@ function App ({ username, logout }: any) {
     {
       path: '/login',
       component: Login,
+    },
+    {
+      path: '/',
+      component: HomePage
     },
   ]
 

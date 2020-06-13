@@ -7,7 +7,7 @@ import _ from 'lodash'
 import { Task } from '../../model/Task'
 import api from '../../util/api'
 import TaskSessionModel from '../../model/TaskSessionModel'
-import { mockStudents, mockTaskSessions } from '../../util/mock'
+import { mockTaskSessions } from '../../util/mock'
 
 type TState = {
   students: Student[]
@@ -21,6 +21,7 @@ type TState = {
 
 type TProps = {
   onSessionCreate: (taskGroups: TaskSessionModel[]) => void
+  students: Student[]
 }
 
 class TaskSessionCreator extends React.Component<TProps> {
@@ -36,7 +37,7 @@ class TaskSessionCreator extends React.Component<TProps> {
     this.handleStartSession = this.handleStartSession.bind(this)
 
     this.state = {
-      students: mockStudents,
+      students: this.props.students,
       selectedStudents: new Map<Student, boolean>(),
       groups: [],
       differentSchoolsMode: false,
