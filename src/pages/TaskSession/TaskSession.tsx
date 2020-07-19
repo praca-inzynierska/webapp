@@ -95,11 +95,11 @@ class TaskSession extends React.Component<TProps> {
               <Tabs>
                 {this.state.taskTools.map((tool) => (
                   <Tabs.Tab
-                    key={tool.id}
-                    active={tool.id === this.state.selectedTaskTool?.id}
+                    key={tool.name}
+                    active={tool.name === this.state.selectedTaskTool?.name}
                     onClick={() => this.setState({ selectedTaskTool: tool })}
                   >
-                    {tool.name}
+                    {tool.displayName}
                   </Tabs.Tab>
                 ))}
               </Tabs>
@@ -111,11 +111,11 @@ class TaskSession extends React.Component<TProps> {
               <Tabs>
                 {this.state.communicationTools.map((tool) => (
                   <Tabs.Tab
-                    key={tool.id}
-                    active={tool.id === this.state.selectedCommunicationTool?.id}
+                    key={tool.name}
+                    active={tool.name === this.state.selectedCommunicationTool?.name}
                     onClick={() => this.setState({ selectedCommunicationTool: tool })}
                   >
-                    {tool.name}
+                    {tool.displayName}
                   </Tabs.Tab>
                 ))}
               </Tabs>

@@ -16,6 +16,10 @@ import ClassSessionCreator from './pages/ClassSessionCreator/ClassSessionCreator
 function App ({ username, logout }: any) {
   const routes = [
     {
+      path: '/home',
+      component: HomePage
+    },
+    {
       path: '/tasks',
       component: TaskList,
     },
@@ -42,11 +46,7 @@ function App ({ username, logout }: any) {
     {
       path: '/login',
       component: Login,
-    },
-    {
-      path: '/',
-      component: HomePage
-    },
+    }
   ]
 
   return (
@@ -54,9 +54,9 @@ function App ({ username, logout }: any) {
       <Navbar fixed="top" className="nav-bar">
         <Navbar.Menu>
           <Navbar.Container>
-            <Navbar.Item href="/">Strona główna</Navbar.Item>
+            <Navbar.Item href="/home">Strona główna</Navbar.Item>
             <Navbar.Item href="/tasks">Zadania</Navbar.Item>
-            <Navbar.Item href="/class">Kreator sesji zadań</Navbar.Item>
+            <Navbar.Item href="/classSession">Kreator sesji zadań</Navbar.Item>
           </Navbar.Container>
           <Navbar.Container position="end">
             {(username === undefined)

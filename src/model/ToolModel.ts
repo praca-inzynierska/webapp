@@ -8,14 +8,14 @@ export enum ToolType {
 }
 
 export class ToolModel {
-  id: string
   name: string
+  displayName: string
   type: ToolType
   tag: string
 
   constructor (id: string, name: string, type: ToolType, tag: string) {
-    this.id = id
-    this.name = name
+    this.name = id
+    this.displayName = name
     this.type = type
     this.tag = tag
   }

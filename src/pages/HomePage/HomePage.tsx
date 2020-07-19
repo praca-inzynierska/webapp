@@ -64,7 +64,7 @@ class HomePage extends React.Component<ComponentProps<any>> {
                     </td>
                     <td>{moment(classSession.startDate).format('LLLL')}</td>
                     <td>{classSession.students.length} uczniów</td>
-                    <td>{`${(classSession.teacher as Teacher).name} ${(classSession.teacher as Teacher).surname}`}</td>
+                    <td>{`${(classSession.teacher as Teacher).user.firstName} ${(classSession.teacher as Teacher).user.lastName}`}</td>
                     <td>
                       <Button color="info" onClick={() => this.openSession(classSession.id)}>
                     Otwórz

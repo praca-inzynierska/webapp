@@ -13,7 +13,7 @@ export default class ClassSessionModel {
   constructor (
     id: number,
     students: number[] | Student[],
-    teacher: number,
+    teacher: number | Teacher,
     taskSessions: number[] | TaskSessionModel[],
     startDate: number,
     endDate: number) {

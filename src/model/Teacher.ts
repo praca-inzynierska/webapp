@@ -1,11 +1,9 @@
-export default class Teacher {
-  id: number
-  name: string
-  surname: string
+import User from './User'
 
-  constructor (id: string, name: string, surname: string) {
-    this.id = parseInt(id)
-    this.name = name
-    this.surname = surname
+export default class Teacher {
+  user: User
+
+  constructor (user: User) {
+    this.user = user
   }
 }
