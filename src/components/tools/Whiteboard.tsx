@@ -7,7 +7,7 @@ class Whiteboard extends ToolWindow<ToolWindowProps> {
     const props: ToolWindowProps = this.props
     return (
       <Iframe className="task-tool"
-        url={`http://localhost:8080/boards/${props.taskSession.taskSessionId}`}
+        url={`http://localhost:8080/boards/${props.taskSession.id}`}
       />
     )
   }

@@ -3,11 +3,10 @@ import { withRouter } from 'react-router'
 import '../../index.css'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
 import './TaskSession.css'
-import { Columns, Container, Heading, Tabs, Box } from 'react-bulma-components'
+import { Box, Columns, Container, Heading, Tabs } from 'react-bulma-components'
 import { toolComponents, ToolModel, ToolType } from '../../model/ToolModel'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import api from '../../util/api'
-import { mockTaskSessions } from '../../util/mock'
 import Student from '../../model/Student'
 import StudentCard from '../ClassSession/StudentCard'
 import moment from 'moment'
@@ -27,6 +26,7 @@ type TState = {
 
 class TaskSession extends React.Component<TProps> {
   readonly state: TState
+
   constructor (props: any) {
     super(props)
     this.state = {
@@ -39,7 +39,8 @@ class TaskSession extends React.Component<TProps> {
   }
 
   componentDidMount () {
-    api.get(`/taskSessions/${this.props.taskSessionId}`)
+    const { taskSessionId } = this.props.match.params
+    api.get(`/taskSessions/${taskSessionId}`)
       .then(response => this.setState(() => {
         const newTaskSession = TaskSessionModel.fromResponse(response.data)
         const tools = Array.from(newTaskSession.task.tools.entries())
@@ -55,18 +56,14 @@ class TaskSession extends React.Component<TProps> {
           selectedCommunicationTool: newCommunicationTools[0]
         }
       }))
-      .catch(() => this.setState({
-        selectedTaskTool: this.state.taskTools[0],
-        selectedCommunicationTool: this.state.communicationTools[0],
-        taskSession: mockTaskSessions[0]
-      }))
   }
 
   render () {
     const tag: string = this.state.selectedTaskTool ? this.state.selectedTaskTool.tag : 'Task'
     const TaskToolComponent = toolComponents[tag]
+    const deadline = moment(this.state.taskSession.deadline)
     return (
-      <div className="page" >
+      <div className="page">
         <Columns style={{ display: 'flex', flexGrow: 0 }}>
           <Columns.Column size="two-fifths">
             <Container>
@@ -79,13 +76,13 @@ class TaskSession extends React.Component<TProps> {
             </Container>
           </Columns.Column>
           <Columns.Column size="two-fifths">
-            {this.state.taskSession?.students.map((student :Student) => (<StudentCard student={student}/>))}
+            {this.state.taskSession?.students.map((student: Student) => (<StudentCard student={student}/>))}
           </Columns.Column>
           <Columns.Column size="one-fifth">
             <div className='flex-column'>
               <Heading size={3}>Termin oddania zadania:</Heading>
-              <Heading size={4}>{moment(this.state.taskSession.deadline).locale('pl').fromNow()}</Heading>
-              <div>{moment(this.state.taskSession.deadline).locale('pl').format('LLL')}</div>
+              <Heading size={4}>{deadline.locale('pl').fromNow()}</Heading>
+              <div>{deadline.locale('pl').format('LLL')}</div>
             </div>
           </Columns.Column>
         </Columns>

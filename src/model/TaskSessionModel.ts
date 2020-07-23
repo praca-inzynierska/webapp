@@ -4,16 +4,16 @@ import { Task } from './Task'
 export default class TaskSessionModel {
   students: Student[]
   task: Task
-  taskSessionId: number
+  id: number
   finished: boolean
   needsHelp: boolean
   deadline: number
   grade: number | null
 
-  constructor (students: Student[], task: Task, taskSessionId: number, deadline: number) {
+  constructor (students: Student[], task: Task, id: number, deadline: number) {
     this.students = students
     this.task = task
-    this.taskSessionId = taskSessionId
+    this.id = id
     this.finished = false
     this.deadline = deadline
     this.needsHelp = false
@@ -29,7 +29,7 @@ export default class TaskSessionModel {
   }
 
   static fromResponse (data: any): TaskSessionModel {
-    return new TaskSessionModel(data.students, data.task, data.taskSessionId, data.deadline)
+    return new TaskSessionModel(data.students, Task.fromResponse(data.task), data.id, data.deadline * 1000)
   }
 
   static empty (): TaskSessionModel {

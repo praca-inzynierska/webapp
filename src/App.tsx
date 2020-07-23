@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Navbar, Tag } from 'react-bulma-components'
+import { Navbar, Tag, Button } from 'react-bulma-components'
 import React from 'react'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
@@ -12,6 +12,7 @@ import { logout } from './actions'
 import ClassSession from './pages/ClassSession/ClassSession'
 import HomePage from './pages/HomePage/HomePage'
 import ClassSessionCreator from './pages/ClassSessionCreator/ClassSessionCreator'
+import api from './util/api'
 
 function App ({ username, logout }: any) {
   const routes = [
@@ -40,7 +41,7 @@ function App ({ username, logout }: any) {
       component: ClassSession
     },
     {
-      path: '/session/:taskName/:taskDescription',
+      path: '/taskSession/:taskSessionId',
       component: TaskSession,
     },
     {
@@ -54,11 +55,14 @@ function App ({ username, logout }: any) {
       <Navbar fixed="top" className="nav-bar">
         <Navbar.Menu>
           <Navbar.Container>
-            <Navbar.Item href="/home">Strona główna</Navbar.Item>
+            <Navbar.Item href="/home">Sesje zajęć</Navbar.Item>
             <Navbar.Item href="/tasks">Zadania</Navbar.Item>
-            <Navbar.Item href="/classSession">Kreator sesji zadań</Navbar.Item>
           </Navbar.Container>
           <Navbar.Container position="end">
+            <Navbar.Item>
+              <Button onClick={() => mockDataRequest()}>Mock data</Button>
+            </Navbar.Item>
+
             {(username === undefined)
               ? <Navbar.Item href="/login">Zaloguj</Navbar.Item>
               : <Navbar.Item href="/login" onClick={logout}><Tag>{username}</Tag></Navbar.Item>
@@ -73,6 +77,10 @@ function App ({ username, logout }: any) {
       </Switch>
     </Router>
   )
+
+  function mockDataRequest () {
+    api.get('/mock')
+  }
 
   function RouteWithSubRoutes (route: any) {
     return (

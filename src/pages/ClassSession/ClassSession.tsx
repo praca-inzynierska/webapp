@@ -29,7 +29,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
 
   componentDidMount () {
     api.get(`classSessions/${this.props.match.params.id}`)
-      .then(response => this.setState({ classSession: ClassSessionModel.fromResponse(response.data) }))
+      .then(response => this.setState({ classSession: ClassSessionModel.fromResponse(response.data), started: true }))
   }
 
   startSessions (taskSessions: TaskSessionModel[]) {

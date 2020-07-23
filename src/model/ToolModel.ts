@@ -22,11 +22,11 @@ export class ToolModel {
 
   static WHITEBOARD = new ToolModel('whiteboard', 'Tablica', ToolType.Task, 'Whiteboard')
   static TEST = new ToolModel('test', 'Test', ToolType.Task, 'Test') // TODO: not implemented
-  static CHAT = new ToolModel('chat', 'Czat', ToolType.Communication, 'Chat') // TODO: not implemented
+  static CHAT = new ToolModel('textChat', 'Czat', ToolType.Communication, 'Chat') // TODO: not implemented
   static VOICECHAT = new ToolModel('voice-chat', 'Czat głosowy', ToolType.Communication, 'VoiceChat') // TODO: not implemented
 
   static getById (toolId: string) {
-    return [...this.taskTools, ...this.communicationTools].findByKey('id', toolId)
+    return [...this.taskTools, ...this.communicationTools].findByKey('name', toolId)
   }
 
   static taskTools: ToolModel[] = [
