@@ -1,17 +1,13 @@
-import React, { ComponentProps } from 'react'
-import { Columns, Button, Heading, Level, Dropdown } from 'react-bulma-components'
-import {
-  Checkbox,
-  Control, Field,
-  Input
-} from 'react-bulma-components/lib/components/form'
-import { withRouter } from 'react-router'
-import { connect } from 'react-redux'
+import React from 'react'
+import { Button, Columns, Dropdown, Heading, Level } from 'react-bulma-components'
+import { Checkbox, Control, Field, Input } from 'react-bulma-components/lib/components/form'
 import StudentCard from './StudentCard'
 import Student from '../../model/Student'
 import _ from 'lodash'
 import { Task } from '../../model/Task'
 import api from '../../util/api'
+import TaskSessionModel from '../../model/TaskSessionModel'
+import { mockStudents, mockTaskSessions } from '../../util/mock'
 
 type TState = {
   students: Student[]
@@ -23,7 +19,11 @@ type TState = {
   selectedTask: Task | null
 }
 
-class SessionCreator extends React.Component<ComponentProps<any>> {
+type TProps = {
+  onSessionCreate: (taskGroups: TaskSessionModel[]) => void
+}
+
+class TaskSessionCreator extends React.Component<TProps> {
   readonly state: TState
 
   constructor (props: any) {
@@ -36,7 +36,7 @@ class SessionCreator extends React.Component<ComponentProps<any>> {
     this.handleStartSession = this.handleStartSession.bind(this)
 
     this.state = {
-      students: [],
+      students: mockStudents,
       selectedStudents: new Map<Student, boolean>(),
       groups: [],
       differentSchoolsMode: false,
@@ -108,21 +108,16 @@ class SessionCreator extends React.Component<ComponentProps<any>> {
   }
 
   handleStartSession () {
-    api.post('/sessions/create', {
+    const sessionsToCreate = {
       taskId: this.state.selectedTask?.id,
       groups: this.state.groups.map(group => group.map(student => student.id))
-    })
+    }
+    api.post('/sessions/create', sessionsToCreate)
+      .then((response) => this.props.onSessionCreate(response.data.groups))
+      .catch(() => this.props.onSessionCreate(mockTaskSessions))
   }
 
   componentDidMount () {
-    const names = _.shuffle(['Adamina', 'Adela', 'Adelajda', 'Adria', 'Adriana', 'Adrianna', 'Agata', 'Agnieszka', 'Aida', 'Alberta', 'Albertyna', 'Albina', 'Aldona', 'Aleksa', 'Aleksandra', 'Aleksja', 'Alesja', 'Alfreda', 'Alicja', 'Alina', 'Alojza', 'Amalia', 'Amanda', 'Amelia', 'Amina', 'Amira', 'Anastazja', 'Anatolia', 'Andrea', 'Andrzeja', 'Andżelika', 'Aneta', 'Anetta', 'Angela', 'Angelika', 'Angelina', 'Aniela', 'Anita', 'Anna', 'Antonina', 'Anzelma', 'Apollina', 'Apolonia', 'Arabella', 'Ariadna', 'Arleta', 'Arnolda', 'Astryda', 'Atena', 'Augusta', 'Augustyna', 'Aurelia', 'Babeta', 'Balbina', 'Barbara', 'Bartłomieja', 'Beata', 'Beatrycja', 'Beatrycze', 'Beatryksa', 'Benedykta', 'Beniamina', 'Benigna', 'Berenika', 'Bernarda', 'Bernadeta', 'Berta', 'Betina', 'Bianka', 'Bibiana', 'Blanka', 'Błażena', 'Bogdana', 'Bogna', 'Boguchwała', 'Bogumiła', 'Bogusława', 'Bojana', 'Bolesława', 'Bona', 'Bożena', 'Bożenna', 'Bożysława', 'Brenda', 'Bromira', 'Bronisława', 'Brunhilda', 'Brygida', 'Cecylia', 'Celestyna', 'Celina', 'Cezaria', 'Cezaryna', 'Celestia', 'Chociemira', 'Chwalisława', 'Ciechosława', 'Ciesława', 'Cinosława', 'Cina', 'Czesława', 'Dajmira', 'Dagna', 'Dagmara', 'Dalia', 'Dalila', 'Dalmira', 'Damroka', 'Dana', 'Daniela', 'Danisława', 'Danuta', 'Dargomira', 'Dargosława', 'Daria', 'Dąbrówka', 'Delfina', 'Delia', 'Deresa', 'Desreta', 'Delinda', 'Diana', 'Dilara', 'Dobiesława', 'Dobrochna', 'Domasława', 'Dominika', 'Donata', 'Dorosława', 'Dorota', 'Dymfna'])
-    const surnames = _.shuffle(['Abażur', 'Bławatek', 'Cekin', 'Dębska', 'Ekler', 'Figa', 'Gałgan', 'Hiacynt', 'Igielna', 'Janczar', 'Klim', 'Lanca', 'Mewa', 'Noteć', 'Ofirska', 'Placek'])
-    const schools = ['1 LO', '2 LO', '3 LO', '4 LO', '5 LO']
-    const newStudents = names.map((name, index) => new Student(index.toString(), `${name} ${surnames[index % surnames.length]}`, schools[index % schools.length]))
-
-    this.setState({
-      students: newStudents,
-    })
     api.get('/tasks')
       .then(response => this.setState({ tasks: response.data }))
   }
@@ -203,9 +198,7 @@ class SessionCreator extends React.Component<ComponentProps<any>> {
                 const selected = this.state.selectedStudents.get(student)
                 return (
                   <Columns.Column key={id} size={2}>
-                    <StudentCard key={id} selectEvent={() => this.handleSelection(student)}
-                      selected={selected}
-                      student={student}/>
+                    <StudentCard key={id} selectEvent={() => this.handleSelection(student)} selected={selected} student={student}/>
                   </Columns.Column>
                 )
               })}
@@ -235,11 +228,4 @@ class SessionCreator extends React.Component<ComponentProps<any>> {
   }
 }
 
-const actionCreators = {}
-
-const component = connect(
-  null,
-  actionCreators
-)(SessionCreator)
-
-export default withRouter(component)
+export default TaskSessionCreator
