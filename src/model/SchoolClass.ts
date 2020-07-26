@@ -1,7 +1,7 @@
 import Student from './Student'
 
 export default class SchoolClass {
-  school: string
+  school: string // TODO: remove this
   classNumber: number
   students: Student[]
 
@@ -9,5 +9,17 @@ export default class SchoolClass {
     this.school = school
     this.students = students
     this.classNumber = classNumber
+  }
+
+  public static fromResponse (response: any, schoolName: string): SchoolClass {
+    return new SchoolClass(
+      schoolName,
+      response.classNumber,
+      response.students.map((it: any) => new Student(
+        it.id,
+        `${it.user.firstName} ${it.user.lastName}`,
+        schoolName,
+        response.classNumber))
+    )
   }
 }

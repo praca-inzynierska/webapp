@@ -1,12 +1,12 @@
 import React, { ComponentProps } from 'react'
 import { withRouter } from 'react-router'
-import { mockStudents } from '../../util/mock'
 import Student from '../../model/Student'
 import SchoolClass from '../../model/SchoolClass'
 import _ from 'lodash'
 import { Button, Columns, Container, Heading, Level } from 'react-bulma-components'
 import SchoolClassCard from './SchoolClassCard'
 import api from '../../util/api'
+import School from '../../model/School'
 
 type TState = {
   students: Student[]
@@ -26,7 +26,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
 
     this.state = {
       chosenSchoolClasses: new Map<SchoolClass, boolean>(),
-      students: mockStudents,
+      students: [],
       schoolClasses: [],
       from: new Date().valueOf(),
       to: new Date().valueOf()
@@ -34,17 +34,12 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
   }
 
   componentDidMount () {
-    const studentsCopy = Array.from(this.state.students)
-    const map: Map<Object, SchoolClass> = new Map()
-    studentsCopy.forEach(student => map.set((
-      `${student.school}${student.schoolClass}`), new SchoolClass(
-      student.school,
-      student.schoolClass,
-      studentsCopy.filter(it =>
-        it.school === student.school &&
-          it.schoolClass === student.schoolClass))))
-    const newSchoolClasses = Array.from(map.values())
-    this.setState({ schoolClasses: _.uniq(newSchoolClasses) })
+    api.get('/school')
+      .then(response => this.setState(() => {
+        const schools: School[] = response.data.map((it: any) => School.fromResponse(it))
+        const schoolClasses: SchoolClass[] = schools.reduce((acc: SchoolClass[], school: School) => acc.concat(school.classes), [])
+        return { schoolClasses }
+      }))
   }
 
   handleSelection (schoolClass: SchoolClass) {
@@ -58,11 +53,11 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
   }
 
   handleSessionCreate () {
-    const studentsToInclude = Array.from(this.state.chosenSchoolClasses.keys()).map(sc =>
-      this.state.students.filter(student =>
-        student.schoolClass === sc.classNumber && student.school === sc.school)
-        .map(student => student.id)
-    ).flat()
+    const studentsToInclude = Array.from(this.state.chosenSchoolClasses.entries())
+      .filter((value) => value[1])
+      .map((value) => value[0].students)
+      .flat()
+      .map((it) => it.id)
     const headers = {
       'Content-Type': 'application/json',
     }
@@ -81,7 +76,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
       <div className='page'>
         <Container>
           <Heading size={1}>
-          Tworzenie sesji zajęć
+            Tworzenie sesji zajęć
           </Heading>
           <Level renderAs="nav">
             <Level.Side align="left">
@@ -95,7 +90,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
           <Columns>
             <Columns.Column size={6} className='flex-column'>
               <Heading>
-              Klasy do wyboru:
+                Klasy do wyboru:
               </Heading>
               <Columns>
                 {this.state.schoolClasses.map((schoolClass, id) => {
@@ -109,7 +104,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
             </Columns.Column>
             <Columns.Column size={6} className='flex-column'>
               <Heading>
-              Wybrane klasy:
+                Wybrane klasy:
               </Heading>
               <Columns>
                 {Array.from(this.state.chosenSchoolClasses.entries())
