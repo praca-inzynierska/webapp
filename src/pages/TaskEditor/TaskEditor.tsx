@@ -4,24 +4,19 @@ import '../../index.css'
 import '../../util/utils'
 import api from '../../util/api'
 
-import {
-  Checkbox,
-  Control,
-  Field,
-  Input,
-  Label,
-  Textarea,
-} from 'react-bulma-components/lib/components/form'
-import { Box, Heading, Dropdown, Button } from 'react-bulma-components'
+import { Checkbox, Control, Field, Input, Label, Textarea, } from 'react-bulma-components/lib/components/form'
+import { Box, Button, Dropdown, Heading } from 'react-bulma-components'
 import Subject from '../../model/Subject'
 import { Task, TaskType, TimeUnit, Tool } from '../../model/Task'
+import Markdown from '../../components/Markdown'
 
 type TProps = RouteComponentProps<TProps> & { taskId: string };
 type TState = {
   [key: string]: any;
   taskId: string,
   editedTask: Task,
-  taskDurationUnit: TimeUnit
+  taskDurationUnit: TimeUnit,
+  markdownRender: boolean
 };
 
 class TaskEditor extends React.Component<TProps> {
@@ -39,6 +34,7 @@ class TaskEditor extends React.Component<TProps> {
     this.onToolChange = this.onToolChange.bind(this)
     this.onTaskTypeChange = this.onTaskTypeChange.bind(this)
     this.launchTask = this.launchTask.bind(this)
+    this.onRenderChange = this.onRenderChange.bind(this)
 
     const { taskId } = this.props.match.params
     this.subjects = [
@@ -64,6 +60,7 @@ class TaskEditor extends React.Component<TProps> {
       taskId,
       editedTask: Task.emptyTask(),
       taskDurationUnit: this.units.findByKey('id', 'minute'),
+      markdownRender: false
     }
   }
 
@@ -95,6 +92,11 @@ class TaskEditor extends React.Component<TProps> {
 
   onToolChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState(this.state.editedTask.tools.set(event.target.name, event.target.checked))
+    console.log(event.target.checked)
+  }
+
+  onRenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ [event.target.name]: event.target.checked })
     console.log(event.target.checked)
   }
 
@@ -181,12 +183,20 @@ class TaskEditor extends React.Component<TProps> {
         <Field>
           <Label>Opis zadania</Label>
           <Control>
-            <Textarea
-              onChange={this.onTitleChange}
-              name="description"
-              placeholder="Wpisz opis zadania"
-              value={description}
-            />
+            {this.state.markdownRender
+              ? <Box>
+                <Markdown source={this.state.editedTask.description}/>
+              </Box>
+              : <Textarea
+                onChange={this.onTitleChange}
+                name="description"
+                placeholder="Wpisz opis zadania"
+                value={description}/>}
+            <Checkbox
+              name="markdownRender"
+              onChange={this.onRenderChange}
+              checked={state.markdownRender}
+            >Podgląd</Checkbox>
           </Control>
         </Field>
         <Field>
