@@ -1,4 +1,9 @@
-iframe {
-    height: 700px !important;
-    width: 1600px !important;
+.task-tool {
+    display: flex !important;
+    flex-grow: 1;
+}
+
+.columns, .column {
+    flex-grow: 1;
+    display: flex;
 }

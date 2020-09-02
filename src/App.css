@@ -1,3 +1,41 @@
+html, body, #root, .App {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+}
+
+html.has-navbar-fixed-top {
+    padding-top: 0 !important;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 0;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+}
+
+.nav-bar {
+    display: flex;
+}
+
+.page {
+    display: flex;
+    margin-top: 3.25rem;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.container {
+    width: 100vw!important;
+}
+
 .App {
     text-align: center;
 }

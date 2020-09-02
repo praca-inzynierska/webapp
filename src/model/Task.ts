@@ -6,10 +6,10 @@ export class Task {
   type: string
   minutes: number
   tools: Map<string, boolean>
-
+  taskData: TaskData
   [key: string]: any;
 
-  constructor (id: string | null, name: string, description: string, subject: string, type: string, minutes: number, tools: Map<string, boolean>) {
+  constructor (id: string | null, name: string, description: string, subject: string, type: string, minutes: number, tools: Map<string, boolean>, taskData: TaskData) {
     this.id = id
     this.name = name
     this.description = description
@@ -17,16 +17,17 @@ export class Task {
     this.type = type
     this.minutes = minutes
     this.tools = tools
+    this.taskData = taskData
   }
 
   public static fromResponse (response: any): Task {
     const tools = new Map()
     response.tools.forEach((tool: string) => tools.set(tool, true))
-    return new Task(response.id, response.name, response.description, response.subject, response.type, response.minutes, tools)
+    return new Task(response.id, response.name, response.description, response.subject, response.type, response.minutes, tools, response.taskData)
   }
 
   public static emptyTask (): Task {
-    return new Task(null, '', '', 'matematyka', 'whiteboard', 0, new Map())
+    return new Task(null, '', '', 'matematyka', 'whiteboard', 0, new Map(), {})
   }
 
   public static serialize (task: Task): string {
@@ -62,12 +63,4 @@ export class TimeUnit {
   }
 }
 
-export class Tool {
-  id: string
-  name: string
-
-  constructor (id: string, name: string) {
-    this.id = id
-    this.name = name
-  }
-}
+export type TaskData = {}

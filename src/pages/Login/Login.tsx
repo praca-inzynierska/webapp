@@ -1,6 +1,6 @@
 import React, { ComponentProps } from 'react'
 import api from '../../util/api'
-import { Box, Button, Tabs } from 'react-bulma-components'
+import { Box, Button, Container, Tabs } from 'react-bulma-components'
 import { withRouter } from 'react-router'
 import { Checkbox, Control, Field, Input, Label } from 'react-bulma-components/lib/components/form'
 import { connect } from 'react-redux'
@@ -10,6 +10,8 @@ type TState = {
   username: string,
   password: string,
   email: string,
+  firstName: string,
+  lastName: string,
   isTeacher: boolean,
   isLogin: boolean
 }
@@ -27,6 +29,8 @@ class Login extends React.Component<ComponentProps<any>> {
       username: '',
       password: '',
       email: '',
+      firstName: '',
+      lastName: '',
       isTeacher: true,
       isLogin: true
     }
@@ -35,17 +39,21 @@ class Login extends React.Component<ComponentProps<any>> {
   handleConfirm () {
     const data = {
       username: this.state.username,
-      password: this.state.password,
+      password: this.state.password
     }
     if (!this.state.isLogin) {
-      Object.assign(data, { isTeacher: this.state.isTeacher })
+      Object.assign(data, {
+        isTeacher: this.state.isTeacher,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName
+      })
     }
     const url = this.state.isLogin ? '/login' : '/register'
     api.post(url, data)
       .then((response) => {
         const { history } = this.props
         api.defaults.headers.Token = response.data.token
-        this.props.login(response.data.token)
+        this.props.login(response.data.token, response.data.username)
         history.push('/tasks')
       })
       .catch(e => console.log(e))
@@ -62,71 +70,97 @@ class Login extends React.Component<ComponentProps<any>> {
   render () {
     const { state } = this
     return (
-      <div className="mainBox">
-        <Tabs
-          fullwidth={true}
-        >
-          <Tabs.Tab active={state.isLogin} onClick={() => this.setState({ isLogin: true })}>
-            Login
-          </Tabs.Tab>
-          <Tabs.Tab active={!state.isLogin} onClick={() => this.setState({ isLogin: false })}>
-            Register
-          </Tabs.Tab>
-        </Tabs>
-        <Field>
-          <Label>Login</Label>
-          <Control>
-            <Input
-              onChange={this.onInputChange}
-              name="username"
-              placeholder="Login"
-              value={state.username}
-            />
-          </Control>
-        </Field>
-        <Field>
-          <Label>Hasło</Label>
-          <Control>
-            <Input
-              onChange={this.onInputChange}
-              name="password"
-              placeholder="Hasło"
-              value={state.password}
-              type="password"
-            />
-          </Control>
-        </Field>
-        {!state.isLogin ? (
-          <div>
-            <Field>
-              <Label>Email</Label>
-              <Control>
-                <Input
-                  onChange={this.onInputChange}
-                  name="email"
-                  placeholder="Email"
-                  value={state.email}
-                  type="email"
-                />
-              </Control>
-            </Field>
-            <Field>
-              <Checkbox
-                name="isTeacher"
-                onChange={this.onCheckboxChange}
-                checked={state.isTeacher}
-              >
+      <div className="page">
+        <Container>
+          <Tabs
+            fullwidth={true}
+          >
+            <Tabs.Tab active={state.isLogin} onClick={() => this.setState({ isLogin: true })}>
+            Logowanie
+            </Tabs.Tab>
+            <Tabs.Tab active={!state.isLogin} onClick={() => this.setState({ isLogin: false })}>
+            Rejestracja
+            </Tabs.Tab>
+          </Tabs>
+          <Field>
+            <Label>Login</Label>
+            <Control>
+              <Input
+                onChange={this.onInputChange}
+                name="username"
+                placeholder="Login"
+                value={state.username}
+              />
+            </Control>
+          </Field>
+          <Field>
+            <Label>Hasło</Label>
+            <Control>
+              <Input
+                onChange={this.onInputChange}
+                name="password"
+                placeholder="Hasło"
+                value={state.password}
+                type="password"
+              />
+            </Control>
+          </Field>
+          {!state.isLogin ? (
+            <div>
+              <Field>
+                <Label>Email</Label>
+                <Control>
+                  <Input
+                    onChange={this.onInputChange}
+                    name="email"
+                    placeholder="Email"
+                    value={state.email}
+                    type="email"
+                  />
+                </Control>
+              </Field>
+              <Field>
+                <Label>Imię</Label>
+                <Control>
+                  <Input
+                    onChange={this.onInputChange}
+                    name="firstName"
+                    placeholder="Imię"
+                    value={state.firstName}
+                    type="firstName"
+                  />
+                </Control>
+              </Field>
+              <Field>
+                <Label>Nazwisko</Label>
+                <Control>
+                  <Input
+                    onChange={this.onInputChange}
+                    name="lastName"
+                    placeholder="Nazwisko"
+                    value={state.lastName}
+                    type="lastName"
+                  />
+                </Control>
+              </Field>
+              <Field>
+                <Checkbox
+                  name="isTeacher"
+                  onChange={this.onCheckboxChange}
+                  checked={state.isTeacher}
+                >
                 Nauczyciel
-              </Checkbox>
-            </Field>
-          </div>
-        ) : ''}
+                </Checkbox>
+              </Field>
+            </div>
+          ) : ''}
 
-        <Box>
-          <Button color="success" onClick={this.handleConfirm}>
-            {state.isLogin ? 'Zaloguj' : 'Zarejestruj'}
-          </Button>
-        </Box>
+          <Box>
+            <Button color="success" onClick={this.handleConfirm}>
+              {state.isLogin ? 'Zaloguj' : 'Zarejestruj'}
+            </Button>
+          </Box>
+        </Container>
       </div>
     )
   }
