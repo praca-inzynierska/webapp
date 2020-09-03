@@ -1,15 +1,27 @@
-import React from 'react'
+import React, { FormEvent } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router'
 import '../../index.css'
 import '../../util/utils'
 import api from '../../util/api'
 
-import { Checkbox, Control, Field, Input, Label, Textarea, } from 'react-bulma-components/lib/components/form'
-import { Box, Button, Container, Dropdown, Heading } from 'react-bulma-components'
 import Subject from '../../model/Subject'
 import Markdown from '../../components/Markdown'
 import { Task, TaskType, TimeUnit } from '../../model/Task'
 import { ToolModel } from '../../model/ToolModel'
+import {
+  Checkbox,
+  DefaultButton,
+  Dropdown,
+  IDropdownOption,
+  Label,
+  SpinButton,
+  Stack,
+  Text,
+  TextField
+} from 'office-ui-fabric-react'
+import { initializeIcons } from 'office-ui-fabric-react/lib/Icons'
+
+initializeIcons()
 
 type TProps = RouteComponentProps<TProps> & { taskId: string };
 type TState = {
@@ -46,7 +58,7 @@ class TaskEditor extends React.Component<TProps> {
     this.units = [
       new TimeUnit('day', 'dni', 3600),
       new TimeUnit('hour', 'godzin', 60),
-      new TimeUnit('minute', 'minutes', 1),
+      new TimeUnit('minute', 'minut', 1),
     ]
     this.taskTypes = [
       new TaskType('whiteboard', 'Tablica'),
@@ -84,36 +96,39 @@ class TaskEditor extends React.Component<TProps> {
     }
   }
 
-  onTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.deepSetState('editedTask', event.target.name, event.target.value)
-    console.log(event.target.value)
+  onTitleChange = (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string | undefined) => {
+    const target = (event.target as HTMLTextAreaElement)
+    this.deepSetState('editedTask', target.id, newValue)
+    console.log(target.value)
   }
 
-  onToolChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState(this.state.editedTask.tools.set(event.target.name, event.target.checked))
-    console.log(event.target.checked)
+  onToolChange = (event?: FormEvent<HTMLInputElement | HTMLElement> | undefined, checked?: boolean | undefined) => {
+    const target = (event!.target as HTMLInputElement)
+    this.setState(this.state.editedTask.tools.set(target.id, checked!))
+    console.log(checked)
   }
 
-  onRenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ [event.target.name]: event.target.checked })
-    console.log(event.target.checked)
+  onRenderChange = (event?: FormEvent<HTMLInputElement | HTMLElement> | undefined, checked?: boolean | undefined) => {
+    const target = (event!.target as HTMLInputElement)
+    this.setState({ [target.id]: checked })
+    console.log(checked)
   }
 
-  onClassChange = (subject: string) => {
+  onClassChange = (event: FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     const { state } = this
-    this.deepSetState('editedTask', 'subject', subject)
+    this.deepSetState('editedTask', 'subject', option?.key)
     console.log(`${state.editedTask.subject} selected`)
   }
 
-  onUnitChange = (taskDurationUnit: string) => {
+  onUnitChange = (event: FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     const { state } = this
-    this.setState({ taskDurationUnit: this.units.findByKey('id', taskDurationUnit) })
+    this.setState({ taskDurationUnit: this.units.findByKey('id', option?.key) })
     console.log(`${state.editedTask.subject} selected`)
   }
 
-  onTaskTypeChange = (taskType: string) => {
+  onTaskTypeChange = (event: FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     const { state } = this
-    this.deepSetState('editedTask', 'type', taskType)
+    this.deepSetState('editedTask', 'type', option?.key)
     console.log(`${state.editedTask.type} selected`)
   }
 
@@ -143,144 +158,98 @@ class TaskEditor extends React.Component<TProps> {
   render () {
     const { description, name, minutes } = this.state.editedTask
     const { state, subjects, taskTypes, units } = this
+    const stackTokens = { childrenGap: 10 }
+    const subjectOptions: IDropdownOption[] = subjects.map((item) => ({ key: item.id, text: item.name }))
+    const unitOptions: IDropdownOption[] = units.map((item) => ({ key: item.id, text: item.name }))
+    const taskTypeOptions: IDropdownOption[] = taskTypes.map((item) => ({ key: item.id, text: item.name }))
     return (
       <div className="page">
-        <Container>
-          <Box>
-            <Heading size={2}>Tworzenie/edycja zadania</Heading>
-          </Box>
-          <Field>
-            <Label>Tytuł zadania</Label>
-            <Control>
-              <Input
+        <Text variant='xLargePlus'>Tworzenie/edycja zadania</Text>
+        <Stack tokens={stackTokens}>
+          <Stack horizontal tokens={stackTokens}>
+            <Stack tokens={stackTokens} style={{ maxWidth: '50%' }} grow={1}>
+              <TextField
+                label="Tytuł zadania"
                 onChange={this.onTitleChange}
-                name="name"
-                placeholder="Wpisz tytuł zadania"
-                value={name}
-              />
-            </Control>
-          </Field>
-          <Field>
-            <Label>Przedmiot</Label>
-            <Control>
+                id="name"
+                value={name}/>
               <Dropdown
-                name="subject"
                 onChange={this.onClassChange}
-                label={
-                  state.editedTask.subject === ''
-                    ? 'Wybierz przedmiot'
-                    : subjects.filter((subject) => subject.id === state.editedTask.subject)[0].name
-                }
-              >
-                {subjects.map((item) => (
-                  <Dropdown.Item key={item.id} value={item.id}>
-                    {item.name}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown>
-            </Control>
-          </Field>
-          <Field>
-            <Label>Opis zadania</Label>
-            <Control>
-              {this.state.markdownRender
-                ? <Box>
-                  <Markdown source={this.state.editedTask.description}/>
-                </Box>
-                : <Textarea
-                  onChange={this.onTitleChange}
-                  name="description"
-                  placeholder="Wpisz opis zadania"
-                  value={description}/>}
-              <Checkbox
-                name="markdownRender"
-                onChange={this.onRenderChange}
-                checked={state.markdownRender}
-              >Podgląd</Checkbox>
-            </Control>
-          </Field>
-          <Field>
-            <Label>Czas trwania</Label>
-            <Control>
-              <Input
-                type="number"
-                onChange={this.onTitleChange}
-                name="minutes"
-                value={minutes}
+                options={subjectOptions}
+                label='Przedmiot'
               />
+
+              <Stack horizontal tokens={stackTokens}>
+                <SpinButton
+                  value={minutes}
+                  defaultValue="0"
+                  label={'Czas trwania'}
+                  min={0}
+                  step={10}
+                />
+                <Dropdown
+                  onChange={this.onUnitChange}
+                  placeholder={state.taskDurationUnit.name}
+                  options={unitOptions}
+                >
+                </Dropdown>
+              </Stack>
               <Dropdown
-                name="taskDurationUnit"
-                onChange={this.onUnitChange}
-                label={state.taskDurationUnit.name}
-              >
-                {units.map((item) => (
-                  <Dropdown.Item key={item.id} value={item.id}>
-                    {item.name}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown>
-            </Control>
-          </Field>
-          <Field>
-            <Label>Narzędzia</Label>
-            <Control>
+                options={taskTypeOptions}
+                onChange={this.onTaskTypeChange}
+                label="Typ zadania"
+              />
+              <Label style={{ paddingBottom: 0, marginBottom: 0 }}>Narzędzia</Label>
               <Checkbox
                 name="textChat"
+                label="Czat tekstowy"
                 onChange={this.onToolChange}
                 checked={state.editedTask.tools.get('textChat')}
-              >
-              Czat tekstowy
-              </Checkbox>
+              />
               <Checkbox
                 name="whiteboard"
+                label="Tablica"
                 onChange={this.onToolChange}
                 checked={state.editedTask.tools.get('whiteboard')}
-              >
-              Tablica
-              </Checkbox>
+              />
               <Checkbox
                 name="voiceChat"
+                label="Czat głosowy"
                 onChange={this.onToolChange}
                 checked={state.editedTask.tools.get('voiceChat')}
-              >
-              Czat głosowy
-              </Checkbox>
-            </Control>
-          </Field>
-          <Field>
-            <Label>Forma odpowiedzi</Label>
-            <Control>
-              <Dropdown
-                name="type"
-                onChange={this.onTaskTypeChange}
-                label={
-                  state.editedTask.type !== ''
-                    ? taskTypes.filter((taskType) => taskType.id === state.editedTask.type)[0].name
-                    : 'Wybierz typ rozwiązania'
-                }
-              >
-                {taskTypes.map((item) => (
-                  <Dropdown.Item key={item.id} value={item.id}>
-                    {item.name}
-                  </Dropdown.Item>
-                ))}
-              </Dropdown>
-            </Control>
-          </Field>
-          <Field kind="group">
-            <Control>
-              <Button color="primary" onClick={this.saveTask}>
+              />
+            </Stack>
+            <Stack tokens={stackTokens} style={{ maxWidth: '50%' }} grow={1}>
+              {this.state.markdownRender
+                ? <div>
+                  <Label htmlFor="description-input">Opis zadania</Label>
+                  <Markdown source={this.state.editedTask.description}/>
+                </div>
+                : <TextField
+                  multiline
+                  rows={18}
+                  resizable={false}
+                  label="Opis zadania"
+                  onChange={this.onTitleChange}
+                  id="description"
+                  name="description"
+                  value={description}/>}
+              <Checkbox
+                label="Podgląd"
+                id="markdownRender"
+                onChange={this.onRenderChange}
+                checked={state.markdownRender}
+              />
+            </Stack>
+          </Stack>
+          <Stack horizontal tokens={stackTokens}>
+            <DefaultButton color="primary" onClick={this.saveTask}>
               Save
-              </Button>
-            </Control>
-            <Control>
-              <Button onClick={this.launchTask}>Test</Button>
-            </Control>
-            <Control>
-              <Button color="link">Cancel</Button>
-            </Control>
-          </Field>
-        </Container>
+            </DefaultButton>
+            <DefaultButton onClick={this.launchTask}>Test</DefaultButton>
+            <DefaultButton color="link">Cancel</DefaultButton>
+          </Stack>
+        </Stack>
       </div>
     )
   }

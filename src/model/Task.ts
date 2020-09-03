@@ -4,12 +4,12 @@ export class Task {
   description: string
   subject: string
   type: string
-  minutes: number
+  minutes: string
   tools: Map<string, boolean>
   taskData: TaskData
   [key: string]: any;
 
-  constructor (id: string | null, name: string, description: string, subject: string, type: string, minutes: number, tools: Map<string, boolean>, taskData: TaskData) {
+  constructor (id: string | null, name: string, description: string, subject: string, type: string, minutes: string, tools: Map<string, boolean>, taskData: TaskData) {
     this.id = id
     this.name = name
     this.description = description
@@ -27,7 +27,7 @@ export class Task {
   }
 
   public static emptyTask (): Task {
-    return new Task(null, '', '', 'matematyka', 'whiteboard', 0, new Map(), {})
+    return new Task(null, '', '', 'matematyka', 'whiteboard', '0', new Map(), {})
   }
 
   public static serialize (task: Task): string {
