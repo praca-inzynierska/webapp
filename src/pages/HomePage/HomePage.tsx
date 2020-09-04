@@ -2,16 +2,27 @@ import React, { ComponentProps } from 'react'
 import { withRouter } from 'react-router'
 import ClassSessionModel from '../../model/ClassSessionModel'
 import api from '../../util/api'
-import { Box, Button, Container, Heading, Table } from 'react-bulma-components'
+import { DefaultButton, DetailsList, IColumn, PrimaryButton, Text } from 'office-ui-fabric-react'
 import moment from 'moment'
 import Teacher from '../../model/Teacher'
 
 type TState = {
-  classSessions: ClassSessionModel[]
+  classSessions: IClassSessionListItem[]
+}
+
+interface IClassSessionListItem {
+  id: number;
+  key: number;
+  from: string;
+  to: string;
+  students: string;
+  teacher: string;
 }
 
 class HomePage extends React.Component<ComponentProps<any>> {
   readonly state: TState
+  private _allItems: IClassSessionListItem[] = []
+  private _columns: IColumn[]
 
   constructor (props: any) {
     super(props)
@@ -20,13 +31,42 @@ class HomePage extends React.Component<ComponentProps<any>> {
     this.state = {
       classSessions: []
     }
+    this._columns = [
+      { key: 'column1', name: '#', fieldName: 'key', minWidth: 25, maxWidth: 25, isResizable: false },
+      { key: 'column2', name: 'Od', fieldName: 'from', minWidth: 100, maxWidth: 200, isResizable: true },
+      { key: 'column3', name: 'Do', fieldName: 'to', minWidth: 100, maxWidth: 200, isResizable: true },
+      { key: 'column4', name: 'Uczniowie', fieldName: 'students', minWidth: 100, maxWidth: 200, isResizable: true },
+      { key: 'column5', name: 'Nauczyciel', fieldName: 'teacher', minWidth: 100, isResizable: true },
+      {
+        key: 'column6',
+        name: '',
+        fieldName: '',
+        minWidth: 100,
+        isResizable: true,
+        onRender: (item: IClassSessionListItem) => {
+          return <DefaultButton onClick={() => this.openSession(item.id)}>Otwórz</DefaultButton>
+        },
+      },
+    ]
   }
 
   componentDidMount () {
     api.get('/classSessions')
       .then(response => {
-        const newClassSessions = response.data.map((item: any) => ClassSessionModel.fromResponse(item))
-        this.setState({ classSessions: newClassSessions })
+        const newClassSessions: ClassSessionModel[] = response.data.map((item: any) => ClassSessionModel.fromResponse(item))
+        this.setState({
+          classSessions: newClassSessions.map((it, index) => (
+            {
+              id: it.id,
+              key: index,
+              from: moment(it.startDate).format('LLLL'),
+              to: moment(it.endDate).format('LLLL'),
+              students: `${it.students.length} uczniów`,
+              teacher: `${(it.teacher as Teacher).user.firstName} ${(it.teacher as Teacher).user.lastName}`,
+            }
+          )
+          )
+        })
       })
   }
 
@@ -41,46 +81,22 @@ class HomePage extends React.Component<ComponentProps<any>> {
   render () {
     return (
       <div className='page'>
-        <Container>
-          <Heading size={1}>
-          Sesje zajęć
-          </Heading>
-          <Box>
-            <Table>
-              <thead>
-                <tr>
-                  <th>Od</th>
-                  <th>Do</th>
-                  <th>Uczniowie</th>
-                  <th>Nauczyciel</th>
-                  <th>Działania</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.classSessions.map((classSession: ClassSessionModel, key: number) => (
-                  <tr key={key}>
-                    <td>
-                      {moment(classSession.startDate).format('LLLL')}
-                    </td>
-                    <td>{moment(classSession.startDate).format('LLLL')}</td>
-                    <td>{classSession.students.length} uczniów</td>
-                    <td>{`${(classSession.teacher as Teacher).user.firstName} ${(classSession.teacher as Teacher).user.lastName}`}</td>
-                    <td>
-                      <Button color="info" onClick={() => this.openSession(classSession.id)}>
-                    Otwórz
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Box>
-          <Box>
-            <Button color="success" onClick={this.openSessionCreator}>
-            Dodaj nową sesję zajęć
-            </Button>
-          </Box>
-        </Container>
+        <Text variant={'xxLargePlus'}> Sesje zajęć</Text>
+        <DetailsList
+          items={this.state.classSessions}
+          columns={this._columns}
+          // setKey="set"
+          // layoutMode={DetailsListLayoutMode.justified}
+          // selection={this._selection}
+          // selectionPreservedOnEmptyClick={true}
+          // ariaLabelForSelectionColumn="Toggle selection"
+          // ariaLabelForSelectAllCheckbox="Toggle selection for all items"
+          // checkButtonAriaLabel="Row checkbox"
+          // onItemInvoked={this._onItemInvoked}
+        />
+        <PrimaryButton onClick={this.openSessionCreator}>
+          Dodaj nową sesję zajęć
+        </PrimaryButton>
       </div>
     )
   }

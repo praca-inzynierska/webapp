@@ -1,13 +1,13 @@
 import React, { ComponentProps } from 'react'
 import '../../index.css'
-import { DetailsList, IColumn, PrimaryButton, DefaultButton, Text } from 'office-ui-fabric-react'
+import { DefaultButton, DetailsList, IColumn, PrimaryButton, Text } from 'office-ui-fabric-react'
 import { Task } from '../../model/Task'
 import api from '../../util/api'
 import { withRouter } from 'react-router'
 
 type TState = {
   [key: string]: any;
-  tasks: Task[]
+  tasks: ITaskListItem[]
 };
 
 interface ITaskListItem {
@@ -48,72 +48,63 @@ class TaskList extends React.Component<ComponentProps<any>> {
     ]
 
     this.state = {
-      tasks: [
-        {
-          id: '1',
-          subject: 'Matematyka',
-          name: 'Zadanie 1',
-          description: 'Opis zadania 1', // to chyba niepotrzebne
-          type: 'test',
-          tools: ['whiteboard', 'textChat'], // to tez
-          minutes: 20,
-        },
-        {
-          id: '1',
-          subject: 'Matematyka',
-          name: 'Zadanie 1',
-          description: 'Opis zadania 1', // to chyba niepotrzebne
-          type: 'test',
-          tools: ['whiteboard', 'textChat'], // to tez
-          minutes: 20,
-        },
-        {
-          id: 3,
-          subject: 'Matematyka',
-          name: 'Zadanie 1',
-          description: 'Opis zadania 1', // to chyba niepotrzebne
-          type: 'test',
-          tools: ['whiteboard', 'textChat'], // to tez
-          minutes: 20,
-        },
-        {
-          id: 4,
-          subject: 'Matematyka',
-          name: 'Zadanie 1',
-          description: 'Opis zadania 1', // to chyba niepotrzebne
-          type: 'test',
-          tools: ['whiteboard', 'textChat'], // to tez
-          minutes: 20,
-        },
-      ].map(taskResponseMock => Task.fromResponse(taskResponseMock))
+      tasks: []
+      // tasks: [
+      //   {
+      //     id: '1',
+      //     subject: 'Matematyka',
+      //     name: 'Zadanie 1',
+      //     description: 'Opis zadania 1', // to chyba niepotrzebne
+      //     type: 'test',
+      //     tools: ['whiteboard', 'textChat'], // to tez
+      //     minutes: 20,
+      //   },
+      //   {
+      //     id: '1',
+      //     subject: 'Matematyka',
+      //     name: 'Zadanie 1',
+      //     description: 'Opis zadania 1', // to chyba niepotrzebne
+      //     type: 'test',
+      //     tools: ['whiteboard', 'textChat'], // to tez
+      //     minutes: 20,
+      //   },
+      //   {
+      //     id: 3,
+      //     subject: 'Matematyka',
+      //     name: 'Zadanie 1',
+      //     description: 'Opis zadania 1', // to chyba niepotrzebne
+      //     type: 'test',
+      //     tools: ['whiteboard', 'textChat'], // to tez
+      //     minutes: 20,
+      //   },
+      //   {
+      //     id: 4,
+      //     subject: 'Matematyka',
+      //     name: 'Zadanie 1',
+      //     description: 'Opis zadania 1', // to chyba niepotrzebne
+      //     type: 'test',
+      //     tools: ['whiteboard', 'textChat'], // to tez
+      //     minutes: 20,
+      //   },
+      // ].map(taskResponseMock => Task.fromResponse(taskResponseMock))
     }
-
-    this._allItems = this.state.tasks.map((it, index) => (
-      {
-        key: index,
-        id: it.id,
-        name: it.name,
-        type: it.type,
-        time: it.minutes
-      }
-    )
-    )
   }
 
   componentDidMount () {
     api.get('/tasks')
       .then((response) => response.data)
-      .then((tasks) => this.setState({ tasks }))
-    this._allItems = this.state.tasks.map((it, index) => (
-      {
-        key: index,
-        id: it.id,
-        name: it.name,
-        type: it.type,
-        time: it.minutes
-      }
-    )
-    )
+      .then((tasks: Task[]) => this.setState({
+        tasks: tasks.map((it, index) => (
+          {
+            key: index,
+            id: it.id,
+            name: it.name,
+            type: it.type,
+            time: `${it.minutes} minut`
+          }
+        )
+        )
+      }))
   }
 
   editTask (id: string | null) {
@@ -131,7 +122,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
       <div className="page">
         <Text variant={'xxLargePlus'}>Zadania</Text>
         <DetailsList
-          items={this._allItems}
+          items={this.state.tasks}
           columns={this._columns}
           // setKey="set"
           // layoutMode={DetailsListLayoutMode.justified}
