@@ -1,6 +1,16 @@
-import React from 'react'
-import { Button, Columns, Dropdown, Heading, Level } from 'react-bulma-components'
-import { Checkbox, Control, Field, Input } from 'react-bulma-components/lib/components/form'
+import React, { FormEvent } from 'react'
+// import { Button, Columns, Dropdown, Heading, Level } from 'react-bulma-components'
+// import { Checkbox, Control, Field, Input } from 'react-bulma-components/lib/components/form'
+import {
+  PrimaryButton,
+  DefaultButton,
+  Stack,
+  Text,
+  Checkbox,
+  SpinButton,
+  Dropdown,
+  IDropdownOption
+} from 'office-ui-fabric-react'
 import StudentCard from './StudentCard'
 import Student from '../../model/Student'
 import _ from 'lodash'
@@ -14,9 +24,9 @@ type TState = {
   selectedStudents: Map<Student, boolean>
   groups: Student[][]
   differentSchoolsMode: boolean,
-  groupSize: number,
+  groupSize: string | undefined,
   tasks: Task[],
-  selectedTask: Task | null
+  selectedTaskId: Task | null
 }
 
 type TProps = {
@@ -41,14 +51,15 @@ class TaskSessionCreator extends React.Component<TProps> {
       selectedStudents: new Map<Student, boolean>(),
       groups: [],
       differentSchoolsMode: false,
-      groupSize: 0,
+      groupSize: undefined,
       tasks: [],
-      selectedTask: null
+      selectedTaskId: null
     }
   }
 
-  onCheckboxChange (event: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({ [event.target.name]: event.target.checked })
+  onCheckboxChange (event?: FormEvent<HTMLInputElement | HTMLElement> | undefined) {
+    const target = (event!.target as HTMLInputElement)
+    this.setState({ [target.name]: target.checked })
   }
 
   onInputChange (event: React.ChangeEvent<HTMLInputElement>) {
@@ -83,7 +94,8 @@ class TaskSessionCreator extends React.Component<TProps> {
 
   generateGroupsFromState () {
     const { groupSize, differentSchoolsMode } = this.state
-    const groupsCount = _.ceil(this.state.students.length / groupSize)
+    const groupSizeNum = parseInt(groupSize!)
+    const groupsCount = _.ceil(this.state.students.length / groupSizeNum)
     const newGroups: Student[][] = Array(groupsCount).fill(0).map(() => [])
     const schools: string[] = _.uniq(this.state.students.map((student: Student) => student.school))
     let students: Student[] = Array.from(this.state.students)
@@ -110,7 +122,7 @@ class TaskSessionCreator extends React.Component<TProps> {
 
   handleStartSession () {
     const sessionsToCreate = {
-      taskId: this.state.selectedTask?.id,
+      taskId: this.state.selectedTaskId,
       groups: this.state.groups.map(group => group.map(student => student.id))
     }
     api.post('/sessions/create', sessionsToCreate)
@@ -124,106 +136,95 @@ class TaskSessionCreator extends React.Component<TProps> {
   }
 
   render () {
+    const taskOptions: IDropdownOption[] = this.state.tasks.map((item) => ({ key: item.id!, text: item.name }))
+    const stackTokens = { childrenGap: 13 }
+    const topStackTokens = { childrenGap: 10 }
+    const columnTokens = { childrenGap: 10 }
+    const columnStyles = {
+      root: {
+        width: '50%'
+      }
+    }
     return (
-      <div className='page'>
-        <Level renderAs="nav">
-          <Level.Side align="left">
-            <Level.Item>
-              <Button onClick={this.handleGroupCreate}>
-                Utwórz grupę
-              </Button>
-            </Level.Item>
-            <Level.Item>
-              <Control>
-                <Button onClick={this.handleRandomGroupsCreate}>
-                  Losuj grupy
-                </Button>
-              </Control>
-            </Level.Item>
-            <Level.Item>
-              <Control>
-                <Input
-                  type="number"
-                  placeholder="Rozmiar grupy"
-                  name="groupSize"
-                  value={this.state.groupSize}
-                  onChange={this.onInputChange}/>
-              </Control>
-            </Level.Item>
-            <Level.Item>
-              <Control>
-                <Checkbox
-                  name="differentSchoolsMode"
-                  onChange={this.onCheckboxChange}
-                  checked={this.state.differentSchoolsMode}
-                >
-                  Różne szkoły w grupie
-                </Checkbox>
-              </Control>
-            </Level.Item>
-          </Level.Side>
-          <Level.Side align="right">
-            <Level.Item>
-              <Field>
-                <Control>
-                  <Dropdown
-                    name="type"
-                    onChange={(task: string) => this.setState({ selectedTask: task })}
-                    label={
-                      this.state.selectedTask?.name ?? 'Zadanie'
-                    }
-                  >
-                    {this.state.tasks.map((item) => (
-                      <Dropdown.Item key={item.id} value={item}>
-                        {item.name}
-                      </Dropdown.Item>
-                    ))}
-                  </Dropdown>
-                </Control>
-              </Field>
-            </Level.Item>
-            <Level.Item>
-              <Button className="is-primary" onClick={this.handleStartSession}>
+      <div >
+        <Stack horizontal horizontalAlign={'space-between'} tokens={stackTokens}>
+          <Stack horizontal tokens={topStackTokens}>
+            <DefaultButton onClick={this.handleGroupCreate}>
+              Utwórz grupę
+            </DefaultButton>
+            <DefaultButton onClick={this.handleRandomGroupsCreate}>
+              Losuj grupy
+            </DefaultButton>
+            <Stack.Item shrink={1}>
+              <SpinButton
+                styles={{ root: { width: 20 } }}
+                placeholder="Rozmiar grupy"
+                value={this.state.groupSize}
+                onChange={this.onInputChange}/>
+            </Stack.Item>
+            <Stack.Item shrink={1} align={'center'}>
+              <Checkbox
+                name="differentSchoolsMode"
+                label="Różne szkoły"
+                onChange={this.onCheckboxChange}
+                checked={this.state.differentSchoolsMode}
+              />
+            </Stack.Item>
+          </Stack>
+          <Stack.Item>
+            <Stack horizontal tokens={topStackTokens}>
+              <Dropdown
+                styles={{ root: { width: 250 } }}
+                onChange={(event: FormEvent<HTMLDivElement>, option?: IDropdownOption) =>
+                  this.setState({ selectedTaskId: option?.key })}
+                options={taskOptions}
+                placeholder='Zadanie'
+              />
+              <PrimaryButton className="is-primary" onClick={this.handleStartSession}>
                 Rozpocznij sesję zadań
-              </Button>
-            </Level.Item>
-          </Level.Side>
-        </Level>
-        <Columns >
-          <Columns.Column size={6} className='flex-column'>
-            <Heading>
-              Uczniowie:
-            </Heading>
-            <Columns>
-              {this.state.students.map((student, id) => {
-                const selected = this.state.selectedStudents.get(student)
-                return (
-                  <Columns.Column key={id} size={2}>
-                    <StudentCard key={id} selectEvent={() => this.handleSelection(student)} selected={selected} student={student}/>
-                  </Columns.Column>
-                )
-              })}
-            </Columns>
-          </Columns.Column>
-          <Columns.Column size={6}>
-
-            <Heading>
-              Grupy:
-            </Heading>
-            {this.state.groups.map((group, groupId) => (
-              <div key={groupId}>
-                <Heading size={4}>Group {groupId + 1}</Heading>
-                <Columns>
-                  {group.map((student, studentId) => (
-                    <Columns.Column key={studentId} size={2}>
-                      <StudentCard key={studentId} student={student}/>
-                    </Columns.Column>
-                  ))}
-                </Columns>
-              </div>
-            ))}
-          </Columns.Column>
-        </Columns>
+              </PrimaryButton>
+            </Stack>
+          </Stack.Item>
+        </Stack>
+        <Stack horizontal tokens={columnTokens}>
+          <Stack.Item grow={1} styles={columnStyles}>
+            <Stack>
+              <Text variant='xxLarge'>
+                Uczniowie:
+              </Text>
+              <Stack horizontal wrap tokens={columnTokens}>
+                {this.state.students.map((student, id) => {
+                  const selected = this.state.selectedStudents.get(student)
+                  return (
+                    <Stack.Item key={id}>
+                      <StudentCard key={id} selectEvent={() => this.handleSelection(student)} selected={selected}
+                        student={student}/>
+                    </Stack.Item>
+                  )
+                })}
+              </Stack>
+            </Stack>
+          </Stack.Item>
+          <Stack.Item grow={1} styles={columnStyles}>
+            <Stack>
+              <Text variant='xxLarge'>
+                Grupy:
+              </Text>
+              {this.state.groups.map((group, groupId) => (
+                <div key={groupId}>
+                  <Text variant='xLarge'>Grupa {groupId + 1}</Text>
+                  <Stack horizontal wrap tokens={columnTokens}>
+                    {group.map((student, studentId) => (
+                      <Stack.Item key={studentId}>
+                        <StudentCard key={studentId} student={student}/>
+                      </Stack.Item>
+                    ))}
+                  </Stack>
+                </div>
+              ))}
+            </Stack>
+          </Stack.Item>
+        </Stack>
       </div>
     )
   }

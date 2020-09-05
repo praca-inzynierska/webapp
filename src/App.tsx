@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Navbar, Tag, Button } from 'react-bulma-components'
+import { Button, Navbar, Tag } from 'react-bulma-components'
 import React from 'react'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
@@ -13,6 +13,7 @@ import ClassSession from './pages/ClassSession/ClassSession'
 import HomePage from './pages/HomePage/HomePage'
 import ClassSessionCreator from './pages/ClassSessionCreator/ClassSessionCreator'
 import api from './util/api'
+import { initializeIcons } from 'office-ui-fabric-react/lib/Icons'
 
 function App ({ username, logout }: any) {
   const routes = [
@@ -50,6 +51,7 @@ function App ({ username, logout }: any) {
     }
   ]
 
+  initializeIcons()
   return (
     <Router>
       <Navbar fixed="top" className="nav-bar">

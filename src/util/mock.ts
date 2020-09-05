@@ -23,7 +23,9 @@ while (studentsCopy.length > 0) {
       studentsCopy.splice(0, 5),
       mockTask,
       123123,
-      moment(Date.now()).add(1, 'hours').toDate().getTime()
+      moment(Date.now()).add(1, 'hours').toDate().getTime(),
+      false,
+      false
     ))
 }
 mockTaskSessions.slice(0, 5).forEach(session => session.markAsFinished())

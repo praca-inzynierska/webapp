@@ -1,12 +1,13 @@
-import { Button, Box, Heading, Image } from 'react-bulma-components'
+import { DefaultButton, Facepile, IFacepilePersona, OverflowButtonType, Stack, Text } from 'office-ui-fabric-react'
+import { Card, ICardTokens } from '@uifabric/react-cards'
 import React from 'react'
 import './StudentCard.css'
 import TaskSessionModel from '../../model/TaskSessionModel'
-import Student from '../../model/Student'
 import { RouteComponentProps, withRouter } from 'react-router'
 
 type TProps = RouteComponentProps & {
-  taskGroup: TaskSessionModel }
+  taskGroup: TaskSessionModel
+}
 
 class TaskSessionCard extends React.Component<TProps> {
   constructor (props: any) {
@@ -21,32 +22,42 @@ class TaskSessionCard extends React.Component<TProps> {
 
   render () {
     const taskSession: TaskSessionModel = this.props.taskGroup
+    const personas: IFacepilePersona[] = taskSession.students.map((it) => ({
+      personaName: it.name,
+      imageUrl: 'http://bulma.io/images/placeholders/640x480.png'
+    })).copyWithin(5, 0, 2)
+    const cardTokens: ICardTokens = {
+      childrenMargin: 10,
+      maxWidth: 400,
+      minWidth: 50,
+    }
+
     return (
       <div>
-        <Box>
-          <Heading size={4} style={{ marginBottom: '8px' }}>
-            {taskSession.task.name}
-          </Heading>
-          <div style={{ paddingBottom: '8px' }}>
-            {taskSession.students.map((student: Student) => (
-              <div key={student.id}>
-                <Image rounded={true} src="http://bulma.io/images/placeholders/640x480.png"
-                  style={{ width: 48, float: 'left', paddingRight: '8px', paddingLeft: '8px' }}/>
-                <div style={{ float: 'left' }}>
-                  {student.name}
-                </div>
-              </div>
-            ))}
-            <div style={{ float: 'right' }}>
-              <Button onClick={this.openTaskSession}>Otwórz sesję</Button>
-            </div>
-            {taskSession.finished
-              ? (<Button style={{ float: 'right' }}>Oceń zadanie</Button>)
-              : null}
-          </div>
+        <Stack>
+
+          <Card horizontal tokens={cardTokens}>
+            <Card.Section grow={1}>
+              <Text variant='large'>
+                {taskSession.task.name}
+              </Text>
+              <Facepile
+                personas={personas}
+                overflowPersonas={personas.slice(2)}
+                maxDisplayablePersonas={3}
+                overflowButtonType={OverflowButtonType.more}
+              />
+            </Card.Section>
+            <Card.Section>
+              <DefaultButton onClick={this.openTaskSession}>Otwórz sesję</DefaultButton>
+              {taskSession.readyToRate
+                ? (<DefaultButton>Oceń zadanie</DefaultButton>)
+                : null}
+            </Card.Section>
+          </Card>
           <br/>
 
-        </Box>
+        </Stack>
       </div>
     )
   }
