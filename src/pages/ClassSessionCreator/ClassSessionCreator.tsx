@@ -3,10 +3,10 @@ import { withRouter } from 'react-router'
 import Student from '../../model/Student'
 import SchoolClass from '../../model/SchoolClass'
 import _ from 'lodash'
-import { Button, Columns, Container, Heading, Level } from 'react-bulma-components'
 import SchoolClassCard from './SchoolClassCard'
 import api from '../../util/api'
 import School from '../../model/School'
+import { PrimaryButton, Stack, Text } from 'office-ui-fabric-react'
 
 type TState = {
   students: Student[]
@@ -72,53 +72,52 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
   }
 
   render () {
+    const stackTokens = { childrenGap: 10 }
+    const stackStyles = {
+      root: {
+        width: '50%'
+      }
+    }
     return (
       <div className='page'>
-        <Container>
-          <Heading size={1}>
-            Tworzenie sesji zajęć
-          </Heading>
-          <Level renderAs="nav">
-            <Level.Side align="left">
-              <Level.Item>
-                <Button onClick={this.handleSessionCreate}>
-                  Utwórz sesję
-                </Button>
-              </Level.Item>
-            </Level.Side>
-          </Level>
-          <Columns>
-            <Columns.Column size={6} className='flex-column'>
-              <Heading>
-                Klasy do wyboru:
-              </Heading>
-              <Columns>
-                {this.state.schoolClasses.map((schoolClass, id) => {
-                  return (
-                    <Columns.Column key={id} size={2}>
-                      <SchoolClassCard selectEvent={() => this.handleSelection(schoolClass)} schoolClass={schoolClass}/>
-                    </Columns.Column>
-                  )
-                })}
-              </Columns>
-            </Columns.Column>
-            <Columns.Column size={6} className='flex-column'>
-              <Heading>
-                Wybrane klasy:
-              </Heading>
-              <Columns>
-                {Array.from(this.state.chosenSchoolClasses.entries())
-                  .filter(it => it[1])
-                  .map(schoolClassEntry => schoolClassEntry[0])
-                  .map((schoolClass, index) => (
-                    <Columns.Column key={index} size={2}>
-                      <SchoolClassCard schoolClass={schoolClass}/>
-                    </Columns.Column>
-                  ))}
-              </Columns>
-            </Columns.Column>
-          </Columns>
-        </Container>
+        <Stack tokens={stackTokens}>
+          <Text variant={'xxLargePlus'}> Tworzenie sesji zajęć </Text>
+          <PrimaryButton onClick={this.handleSessionCreate}>
+            Utwórz sesję
+          </PrimaryButton>
+          <Stack horizontal tokens={stackTokens}>
+            <Stack.Item grow={1} styles={stackStyles}>
+              <Stack tokens={stackTokens}>
+                <Text variant={'xLarge'}>
+                  Klasy do wyboru:
+                </Text>
+                <Stack horizontal wrap tokens={stackTokens}>
+                  {this.state.schoolClasses.map((schoolClass, id) => {
+                    return (
+                      <SchoolClassCard key={id} selectEvent={() => this.handleSelection(schoolClass)}
+                        schoolClass={schoolClass}/>
+                    )
+                  })}
+                </Stack>
+              </Stack>
+            </Stack.Item>
+            <Stack.Item grow={1} styles={stackStyles}>
+              <Stack tokens={stackTokens}>
+                <Text variant={'xLarge'}>
+                  Wybrane klasy:
+                </Text>
+                <Stack horizontal wrap tokens={stackTokens} styles={stackStyles}>
+                  {Array.from(this.state.chosenSchoolClasses.entries())
+                    .filter(it => it[1])
+                    .map(schoolClassEntry => schoolClassEntry[0])
+                    .map((schoolClass, index) => (
+                      <SchoolClassCard key={index} schoolClass={schoolClass}/>
+                    ))}
+                </Stack>
+              </Stack>
+            </Stack.Item>
+          </Stack>
+        </Stack>
       </div>
     )
   }

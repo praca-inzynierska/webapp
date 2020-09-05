@@ -85,14 +85,6 @@ class HomePage extends React.Component<ComponentProps<any>> {
         <DetailsList
           items={this.state.classSessions}
           columns={this._columns}
-          // setKey="set"
-          // layoutMode={DetailsListLayoutMode.justified}
-          // selection={this._selection}
-          // selectionPreservedOnEmptyClick={true}
-          // ariaLabelForSelectionColumn="Toggle selection"
-          // ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-          // checkButtonAriaLabel="Row checkbox"
-          // onItemInvoked={this._onItemInvoked}
         />
         <PrimaryButton onClick={this.openSessionCreator}>
           Dodaj nową sesję zajęć
