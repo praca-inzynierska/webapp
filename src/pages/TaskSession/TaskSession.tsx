@@ -1,16 +1,14 @@
 import React, { ComponentProps } from 'react'
-import { withRouter } from 'react-router'
 import '../../index.css'
 import 'react-bulma-components/dist/react-bulma-components.min.css'
 import './TaskSession.css'
-import { Box, Columns, Container, Heading, Tabs } from 'react-bulma-components'
+import { Stack, Text, Pivot, PivotItem, Facepile, Separator, OverflowButtonType } from 'office-ui-fabric-react'
 import { toolComponents, ToolModel, ToolType } from '../../model/ToolModel'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import api from '../../util/api'
-import Student from '../../model/Student'
-import StudentCard from '../ClassSession/StudentCard'
 import moment from 'moment'
 import 'moment/locale/pl'
+import { withRouter } from 'react-router'
 
 type TProps = ComponentProps<any> & {
   taskSessionId: string
@@ -59,68 +57,73 @@ class TaskSession extends React.Component<TProps> {
   }
 
   render () {
-    const tag: string = this.state.selectedTaskTool ? this.state.selectedTaskTool.tag : 'Task'
-    const TaskToolComponent = toolComponents[tag]
     const deadline = moment(this.state.taskSession.deadline)
+    const personas = this.state.taskSession.students.map((it) => ({
+      personaName: it.name,
+      imageUrl: 'http://bulma.io/images/placeholders/640x480.png'
+    }))
+    const stackTokens = {
+      childrenGap: 10
+    }
     return (
       <div className="page">
-        <Columns style={{ display: 'flex', flexGrow: 0 }}>
-          <Columns.Column size="two-fifths">
-            <Container>
-              <Box>
-                <Heading size={2}>{this.state.taskSession.task.name}</Heading>
-                <Heading subtitle size={5}>
+        <Stack>
+          <Stack horizontal tokens={stackTokens}>
+            <Stack.Item grow={2}>
+              <Stack>
+                <Text variant={'xxLargePlus'}>{this.state.taskSession.task.name}</Text>
+                <Text variant={'xLarge'}>
                   {this.state.taskSession.task.description}
-                </Heading>
-              </Box>
-            </Container>
-          </Columns.Column>
-          <Columns.Column size="two-fifths">
-            {this.state.taskSession?.students.map((student: Student) => (<StudentCard student={student}/>))}
-          </Columns.Column>
-          <Columns.Column size="one-fifth">
-            <div className='flex-column'>
-              <Heading size={3}>Termin oddania zadania:</Heading>
-              <Heading size={4}>{deadline.locale('pl').fromNow()}</Heading>
-              <div>{deadline.locale('pl').format('LLL')}</div>
-            </div>
-          </Columns.Column>
-        </Columns>
-        <Columns>
-          <Columns.Column size="four-fifths">
-            <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>
-              <Tabs>
+                </Text>
+              </Stack>
+            </Stack.Item>
+            <Separator vertical/>
+            <Stack.Item grow={2} align={'center'}>
+              <Facepile
+                personas={personas}
+                overflowPersonas={personas.slice(2)}
+                maxDisplayablePersonas={3}
+                overflowButtonType={OverflowButtonType.more}
+              />
+            </Stack.Item>
+            <Separator vertical/>
+            <Stack.Item grow={1}>
+              <div className='flex-column'>
+                <Text variant={'xLarge'}>Termin oddania zadania:</Text>
+                <Text variant={'large'}>{deadline.locale('pl').fromNow()}</Text>
+                <div>{deadline.locale('pl').format('LLL')}</div>
+              </div>
+            </Stack.Item>
+          </Stack>
+          <Separator/>
+          <Stack horizontal tokens={stackTokens}>
+            <Stack.Item grow={4}>
+              <Pivot>
                 {this.state.taskTools.map((tool) => (
-                  <Tabs.Tab
+                  <PivotItem
                     key={tool.name}
-                    active={tool.name === this.state.selectedTaskTool?.name}
-                    onClick={() => this.setState({ selectedTaskTool: tool })}
+                    headerText={tool.displayName}
                   >
-                    {tool.displayName}
-                  </Tabs.Tab>
+                    {toolComponents[tool.tag]}
+                  </PivotItem>
                 ))}
-              </Tabs>
-              {this.state.selectedTaskTool ? <TaskToolComponent taskSession={this.state.taskSession}/> : <div/>}
-            </div>
-          </Columns.Column>
-          <Columns.Column>
-            <div style={{ display: 'flex', flexGrow: 1, flexDirection: 'column' }}>
-              <Tabs>
+              </Pivot>
+            </Stack.Item>
+            <Separator vertical/>
+            <Stack.Item grow={1}>
+              <Pivot>
                 {this.state.communicationTools.map((tool) => (
-                  <Tabs.Tab
+                  <PivotItem
                     key={tool.name}
-                    active={tool.name === this.state.selectedCommunicationTool?.name}
-                    onClick={() => this.setState({ selectedCommunicationTool: tool })}
+                    headerText={tool.displayName}
                   >
-                    {tool.displayName}
-                  </Tabs.Tab>
+                    <div>Communication placeholder</div>
+                  </PivotItem>
                 ))}
-              </Tabs>
-              <div>Communication placeholder</div>
-            </div>
-          </Columns.Column>
-        </Columns>
-
+              </Pivot>
+            </Stack.Item>
+          </Stack>
+        </Stack>
       </div>
     )
   }
