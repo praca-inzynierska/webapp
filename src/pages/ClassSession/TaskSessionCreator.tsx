@@ -1,6 +1,4 @@
 import React, { FormEvent } from 'react'
-// import { Button, Columns, Dropdown, Heading, Level } from 'react-bulma-components'
-// import { Checkbox, Control, Field, Input } from 'react-bulma-components/lib/components/form'
 import {
   PrimaryButton,
   DefaultButton,

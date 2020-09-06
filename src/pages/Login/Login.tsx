@@ -1,6 +1,5 @@
 import React, { ComponentProps, FormEvent } from 'react'
 import api from '../../util/api'
-// import { Box, Button, Container, Tabs } from 'react-bulma-components'
 import { withRouter } from 'react-router'
 import { Checkbox, Pivot, PivotItem, PrimaryButton, Stack, TextField } from 'office-ui-fabric-react'
 import { connect } from 'react-redux'

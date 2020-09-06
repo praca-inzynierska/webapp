@@ -1,6 +1,5 @@
 import React, { ComponentProps } from 'react'
 import '../../index.css'
-import 'react-bulma-components/dist/react-bulma-components.min.css'
 import './TaskSession.css'
 import { Stack, Text, Pivot, PivotItem, Facepile, Separator, OverflowButtonType } from 'office-ui-fabric-react'
 import { toolComponents, ToolModel, ToolType } from '../../model/ToolModel'
