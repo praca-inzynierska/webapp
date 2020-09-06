@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Button, Navbar, Tag } from 'react-bulma-components'
 import React from 'react'
 import TaskEditor from './pages/TaskEditor/TaskEditor'
 import './App.css'
@@ -13,7 +12,7 @@ import ClassSession from './pages/ClassSession/ClassSession'
 import HomePage from './pages/HomePage/HomePage'
 import ClassSessionCreator from './pages/ClassSessionCreator/ClassSessionCreator'
 import api from './util/api'
-import { initializeIcons } from 'office-ui-fabric-react/lib/Icons'
+import { CommandBarButton, initializeIcons, IStackStyles, Persona, PersonaSize, Stack } from 'office-ui-fabric-react'
 
 function App ({ username, logout }: any) {
   const routes = [
@@ -50,28 +49,37 @@ function App ({ username, logout }: any) {
       component: Login,
     }
   ]
+  const stackStyles: Partial<IStackStyles> = { root: { height: 44 } }
 
   initializeIcons()
   return (
     <Router>
-      <Navbar fixed="top" className="nav-bar">
-        <Navbar.Menu>
-          <Navbar.Container>
-            <Navbar.Item href="/home">Sesje zajęć</Navbar.Item>
-            <Navbar.Item href="/tasks">Zadania</Navbar.Item>
-          </Navbar.Container>
-          <Navbar.Container position="end">
-            <Navbar.Item>
-              <Button onClick={() => mockDataRequest()}>Mock data</Button>
-            </Navbar.Item>
+      <Stack horizontal styles={stackStyles} horizontalAlign={'space-between'}>
+        <Stack horizontal >
+          <CommandBarButton
+            text="Sesje zadań"
+            href="/home"
+          />
+          <CommandBarButton
+            text="Zadania"
+            href="/tasks"
+          />
+        </Stack>
 
-            {(username === undefined)
-              ? <Navbar.Item href="/login">Zaloguj</Navbar.Item>
-              : <Navbar.Item href="/login" onClick={logout}><Tag>{username}</Tag></Navbar.Item>
-            }
-          </Navbar.Container>
-        </Navbar.Menu>
-      </Navbar>
+        <Stack horizontal>
+          <CommandBarButton onClick={mockDataRequest}>Mock data</CommandBarButton>
+
+          {(username === undefined)
+            ? <CommandBarButton href="/login">Zaloguj</CommandBarButton>
+            : <CommandBarButton href="/login" onClick={logout}>
+              <Persona
+                size={PersonaSize.size24}
+                text={username}
+              />
+            </CommandBarButton>
+          }
+        </Stack>
+      </Stack>
       <Switch>
         {routes.map((route, i) => (
           <RouteWithSubRoutes key={i} {...route} />
