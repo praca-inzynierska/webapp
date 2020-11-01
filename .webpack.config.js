@@ -8,7 +8,7 @@ module.exports = {
   devtool: 'inline-source-map',
 
   // The application entry point
-  entry: './src/index.tsx',
+  entry: './src/index.js',
 
   // Where to compile the bundle
   // By default the output directory is `dist`

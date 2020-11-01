@@ -24,11 +24,10 @@ class ClassSessionsScreen extends React.Component<Props, State> {
   }
 
   componentDidMount () {
-    var data = this.props.navigation.state.params
-    api.get('classSessions', { headers: { Token: data!.token } })
+    api.get('classSessions')
       .then((response: any) => {
         console.log(response)
-        this.setState({ classSessions: response.data, token: data!.token })
+        this.setState({ classSessions: response.data })
       })
       .catch((e: any) => console.log(e))
   }

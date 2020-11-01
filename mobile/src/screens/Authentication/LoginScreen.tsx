@@ -5,6 +5,8 @@ import { Fonts } from '../../assets'
 import { NavigationScreenProp, NavigationState } from 'react-navigation'
 import { SceneMap, TabView } from 'react-native-tab-view'
 import api from '../../utils/api'
+import { login } from '../../actions'
+import { connect } from 'react-redux'
 
 interface State {
   login: string,
@@ -18,6 +20,7 @@ interface State {
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>
+  login: any
 }
 
 class LoginScreen extends React.Component<Props, State> {
@@ -39,7 +42,7 @@ class LoginScreen extends React.Component<Props, State> {
     LoginRoute = () => (
       <View style={styles.container}>
         <TextInput
-          style={{ height: 40, alignSelf: 'stretch', borderColor: 'gray', borderWidth: 1 }}      //TODO add to components
+          style={styles.field}      //TODO add to components
           onChangeText={(text) => {
             this.setState({
               login: text
@@ -48,7 +51,7 @@ class LoginScreen extends React.Component<Props, State> {
           placeholder="Login"
         />
         <TextInput
-          style={{ height: 40, alignSelf: 'stretch', borderColor: 'gray', borderWidth: 1 }}      //TODO add to components
+          style={styles.field}      //TODO add to components
           onChangeText={(text) => {
             this.setState({
               password: text
@@ -56,8 +59,10 @@ class LoginScreen extends React.Component<Props, State> {
           }}
           placeholder="Hasło"
         />
-        <Button title={'Zaloguj'}
-          onPress={this.handleLogin}/>
+        <View style={{ marginTop: 'auto', marginBottom: 16 }}>
+          <Button title={'Zaloguj'}
+            onPress={this.handleLogin}/>
+        </View>
       </View>
 
     )
@@ -65,7 +70,7 @@ class LoginScreen extends React.Component<Props, State> {
      RegisterRoute = () => (
        <View style={styles.container}>
          <TextInput
-           style={{ height: 40, alignSelf: 'stretch', borderColor: 'gray', borderWidth: 1 }}      //TODO add to components
+           style={styles.field}     //TODO add to components
            onChangeText={(text) => {
              this.setState({
                login: text
@@ -74,7 +79,7 @@ class LoginScreen extends React.Component<Props, State> {
            placeholder="Login"
          />
          <TextInput
-           style={{ height: 40, alignSelf: 'stretch', borderColor: 'gray', borderWidth: 1 }}      //TODO add to components
+           style={styles.field}     //TODO add to components
            onChangeText={(text) => {
              this.setState({
                password: text
@@ -84,7 +89,7 @@ class LoginScreen extends React.Component<Props, State> {
            placeholder="Hasło"
          />
          <TextInput
-           style={{ height: 40, alignSelf: 'stretch', borderColor: 'gray', borderWidth: 1 }}      //TODO add to components
+           style={styles.field}     //TODO add to components
            onChangeText={(text) => {
              this.setState({
                password: text
@@ -93,7 +98,7 @@ class LoginScreen extends React.Component<Props, State> {
            placeholder="Email"
          />
          <TextInput
-           style={{ height: 40, alignSelf: 'stretch', borderColor: 'gray', borderWidth: 1 }}      //TODO add to components
+           style={styles.field}     //TODO add to components
            onChangeText={(text) => {
              this.setState({
                password: text
@@ -102,7 +107,7 @@ class LoginScreen extends React.Component<Props, State> {
            placeholder="Imię"
          />
          <TextInput
-           style={{ height: 40, alignSelf: 'stretch', borderColor: 'gray', borderWidth: 1 }}      //TODO add to components
+           style={styles.field}     //TODO add to components
            onChangeText={(text) => {
              this.setState({
                password: text
@@ -110,8 +115,10 @@ class LoginScreen extends React.Component<Props, State> {
            }}
            placeholder="Nazwisko"
          />
-         <Button title="Zarejestruj"
-           onPress={this.handleRegister}/>
+         <View style={{ marginTop: 'auto', marginBottom: 16 }}>
+           <Button title="Zarejestruj"
+             onPress={this.handleRegister}/>
+         </View>
        </View>
      )
 
@@ -136,6 +143,8 @@ class LoginScreen extends React.Component<Props, State> {
       const url = '/login'
       await api.post(url, data)
         .then((response: any) => {
+          api.defaults.headers.Token = response.data.token
+          this.props.login(response.data.token, response.data.username)
           this.props.navigation.navigate({ routeName: 'Zajęcia', params: response.data })
         })
         .catch((e:any) => {
@@ -168,12 +177,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 20,
-    justifyContent: 'space-around'
-
+    marginTop: '33%',
+    flexDirection: 'column'
+  },
+  field: {
+    marginTop: 16,
+    height: 40,
+    borderColor: 'black',
+    borderWidth: 1
   },
   text: {
     ...Fonts.title
   }
 })
 
-export default LoginScreen
+const actionCreators = {
+  login: login
+}
+
+export default connect(
+  null,
+  actionCreators
+)(LoginScreen)

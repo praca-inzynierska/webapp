@@ -2,9 +2,11 @@ import React from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { Fonts, Strings } from '../../assets'
 import { NavigationScreenProp, NavigationState } from 'react-navigation'
+import { connect } from 'react-redux'
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState>
+  username: string
 }
 
 interface State {
@@ -45,7 +47,9 @@ class SplashScreen extends React.Component< Props, State> {
   isUserLoggedIn () {
     setTimeout(() => {
       this.setState({ inProgress: false })
-      this.props.navigation.navigate({ routeName: 'routeLogin' })
+      if (this.props.username == null) {
+        this.props.navigation.navigate({ routeName: 'routeLogin' })
+      } else this.props.navigation.navigate({ routeName: 'routeHome' })
     }, 100)
   }
 }
@@ -61,4 +65,8 @@ const styles = StyleSheet.create({
   }
 })
 
-export default SplashScreen
+const mapStateToProps = (state: any) => ({
+  username: state.auth.username
+})
+
+export default connect(mapStateToProps)(SplashScreen)
