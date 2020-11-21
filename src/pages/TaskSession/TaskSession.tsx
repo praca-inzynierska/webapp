@@ -1,8 +1,8 @@
 import React, { ComponentProps } from 'react'
 import '../../index.css'
 import './TaskSession.css'
-import { Stack, Text, Pivot, PivotItem, Facepile, Separator, OverflowButtonType } from 'office-ui-fabric-react'
-import { toolComponents, ToolModel, ToolType } from '../../model/ToolModel'
+import { Facepile, OverflowButtonType, Pivot, PivotItem, Separator, Stack, Text } from 'office-ui-fabric-react'
+import { ToolModel, ToolType } from '../../model/ToolModel'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import api from '../../util/api'
 import moment from 'moment'
@@ -27,8 +27,8 @@ class TaskSession extends React.Component<TProps> {
   constructor (props: any) {
     super(props)
     this.state = {
-      taskTools: ToolModel.taskTools, // TODO: pobieranie narzedzi na podstawie id zadania
-      communicationTools: ToolModel.communicationTools,
+      taskTools: [], // TODO: pobieranie narzedzi na podstawie id zadania
+      communicationTools: [],
       taskSession: TaskSessionModel.empty(),
       selectedTaskTool: null,
       selectedCommunicationTool: null
@@ -98,14 +98,17 @@ class TaskSession extends React.Component<TProps> {
           <Stack horizontal tokens={stackTokens}>
             <Stack.Item grow={4}>
               <Pivot>
-                {this.state.taskTools.map((tool) => (
-                  <PivotItem
-                    key={tool.name}
-                    headerText={tool.displayName}
-                  >
-                    {toolComponents[tool.tag]}
-                  </PivotItem>
-                ))}
+                {this.state.taskTools.map((tool) => {
+                  return (
+                    <
+                      PivotItem
+                      key={tool.toolId}
+                      headerText={tool.displayName}
+                    >
+                      <tool.component taskSession={this.state.taskSession}/>
+                    </PivotItem>
+                  )
+                })}
               </Pivot>
             </Stack.Item>
             <Separator vertical/>
@@ -113,10 +116,10 @@ class TaskSession extends React.Component<TProps> {
               <Pivot>
                 {this.state.communicationTools.map((tool) => (
                   <PivotItem
-                    key={tool.name}
+                    key={tool.toolId}
                     headerText={tool.displayName}
                   >
-                    <div>Communication placeholder</div>
+                    <tool.component taskSession={this.state.taskSession}/>
                   </PivotItem>
                 ))}
               </Pivot>
