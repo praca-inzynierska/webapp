@@ -6,8 +6,9 @@ import _ from 'lodash'
 import SchoolClassCard from './SchoolClassCard'
 import api from '../../util/api'
 import School from '../../model/School'
-import { PrimaryButton, Stack, Text, SpinButton, DatePicker, DayOfWeek } from 'office-ui-fabric-react'
+import { DatePicker, DayOfWeek, PrimaryButton, SpinButton, Stack, Text } from 'office-ui-fabric-react'
 import moment from 'moment'
+import ClassSessionModel from '../../model/ClassSessionModel'
 
 type TState = {
   students: Student[]
@@ -17,10 +18,14 @@ type TState = {
   to: number
 }
 
-class ClassSessionCreator extends React.Component<ComponentProps<any>> {
+type TProps = ComponentProps<any> & {
+  classSessionId: number
+}
+
+class ClassSessionCreator extends React.Component<TProps> {
   readonly state: TState
 
-  constructor (props: any) {
+  constructor (props: TProps) {
     super(props)
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSessionCreate = this.handleSessionCreate.bind(this)
@@ -37,8 +42,8 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
       chosenSchoolClasses: new Map<SchoolClass, boolean>(),
       students: [],
       schoolClasses: [],
-      from: new Date().valueOf(),
-      to: new Date().valueOf()
+      from: 0,
+      to: 0
     }
   }
 
@@ -47,6 +52,27 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
       .then(response => this.setState(() => {
         const schools: School[] = response.data.map((it: any) => School.fromResponse(it))
         const schoolClasses: SchoolClass[] = schools.reduce((acc: SchoolClass[], school: School) => acc.concat(school.classes), [])
+        if (this.props.match.params.classSessionId != null) {
+          api.get(`/classSessions/${this.props.match.params.classSessionId}`)
+            .then(response => this.setState(() => {
+              const classSession: ClassSessionModel = response.data
+              const studentsMap = new Map<number, SchoolClass>()
+              const chosenSchoolClasses = this.state.chosenSchoolClasses
+              schoolClasses.forEach((schoolClass) => {
+                schoolClass.students.forEach(student => studentsMap.set(student.id, schoolClass))
+                chosenSchoolClasses.set(schoolClass, false)
+              })
+              response.data.students
+                .map((value: Student) => studentsMap.get(value.id))
+                .forEach((value: SchoolClass) => chosenSchoolClasses.set(value, true))
+              return {
+                from: classSession.startDate * 1000,
+                to: classSession.endDate * 1000,
+                students: classSession.students,
+                chosenSchoolClasses: chosenSchoolClasses
+              }
+            }))
+        }
         return { schoolClasses }
       }))
   }
@@ -112,14 +138,14 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
     var time = this.getTime(value)
     time.subtract(15, 'minutes')
     return time.format('HH:mm')
-  };
+  }
 
   onSpinButtonValidate (value: string) {
     var time = this.getTime(value)
     if (time.isValid()) {
       return time.format('HH:mm')
     } else return '00:00'
-  };
+  }
 
   onDateChange (date: Date | null | undefined) {
     this.setState({ from: date?.getTime() })
@@ -139,7 +165,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
     return (
       <div className='page'>
         <Stack tokens={stackTokens}>
-          <Text variant={'xxLargePlus'}> Tworzenie sesji zajęć </Text>
+          <Text variant={'xxLargePlus'}> Tworzenie/edycja sesji zajęć </Text>
           <Stack horizontal tokens={stackTokens}>
             <Stack.Item shrink={2}>
               <DatePicker
@@ -147,12 +173,13 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
                 placeholder="Wybierz datę"
                 onSelectDate={this.onDateChange}
                 formatDate={this.formatDate}
+                value={moment(this.state.to).toDate()}
               />
             </Stack.Item>
             <Stack.Item shrink={1}>
               <SpinButton
                 label={'Od'}
-                value={'08:00'}
+                value={moment(this.state.to).format('hh:mm')}
                 onValidate={this.onSpinButtonValidate}
                 onIncrement={this.onSpinButtonIncrement}
                 onDecrement={this.onSpinButtonDecrement}
@@ -162,7 +189,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
             <Stack.Item shrink={1}>
               <SpinButton
                 label={'Do'}
-                value={'09:00'}
+                value={moment(this.state.to).format('hh:mm')}
                 onValidate={this.onSpinButtonValidate}
                 onIncrement={this.onSpinButtonIncrement}
                 onDecrement={this.onSpinButtonDecrement}
@@ -171,7 +198,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
             </Stack.Item>
             <Stack.Item>
               <PrimaryButton onClick={this.handleSessionCreate}>
-              Utwórz sesję
+                Zapisz sesję
               </PrimaryButton>
             </Stack.Item>
           </Stack>
@@ -182,12 +209,12 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
                   Klasy do wyboru:
                 </Text>
                 <Stack horizontal wrap tokens={stackTokens}>
-                  {this.state.schoolClasses.map((schoolClass, id) => {
-                    return (
-                      <SchoolClassCard key={id} selectEvent={() => this.handleSelection(schoolClass)}
-                        schoolClass={schoolClass}/>
-                    )
-                  })}
+                  {Array.from(this.state.chosenSchoolClasses.entries())
+                    .filter(it => !it[1])
+                    .map(schoolClassEntry => schoolClassEntry[0])
+                    .map((schoolClass, index) => (
+                      <SchoolClassCard key={index} schoolClass={schoolClass} selectEvent={() => this.handleSelection(schoolClass)} />
+                    ))}
                 </Stack>
               </Stack>
             </Stack.Item>
@@ -201,7 +228,7 @@ class ClassSessionCreator extends React.Component<ComponentProps<any>> {
                     .filter(it => it[1])
                     .map(schoolClassEntry => schoolClassEntry[0])
                     .map((schoolClass, index) => (
-                      <SchoolClassCard key={index} schoolClass={schoolClass}/>
+                      <SchoolClassCard key={index} schoolClass={schoolClass} selectEvent={() => this.handleSelection(schoolClass)} />
                     ))}
                 </Stack>
               </Stack>

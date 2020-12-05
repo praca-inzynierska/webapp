@@ -41,10 +41,13 @@ class HomePage extends React.Component<ComponentProps<any>> {
         key: 'column6',
         name: '',
         fieldName: '',
-        minWidth: 100,
+        minWidth: 200,
         isResizable: true,
         onRender: (item: IClassSessionListItem) => {
-          return <DefaultButton onClick={() => this.openSession(item.id)}>Otwórz</DefaultButton>
+          return <div>
+            <DefaultButton onClick={() => this.openSession(item.id)}>Otwórz</DefaultButton>
+            <DefaultButton onClick={() => this.editSession(item.id)}>Edytuj</DefaultButton>
+          </div>
         },
       },
     ]
@@ -72,6 +75,10 @@ class HomePage extends React.Component<ComponentProps<any>> {
 
   openSession (id: number) {
     this.props.history.push(`/classSession/${id}`)
+  }
+
+  editSession (id: number) {
+    this.props.history.push(`/classSession/edit/${id}`)
   }
 
   openSessionCreator () {

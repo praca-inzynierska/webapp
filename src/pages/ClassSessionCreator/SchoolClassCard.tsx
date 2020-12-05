@@ -1,4 +1,5 @@
 import { Card, ICardTokens } from '@uifabric/react-cards'
+import './SchoolClassCard.css'
 import React from 'react'
 import SchoolClass from '../../model/SchoolClass'
 
@@ -16,7 +17,7 @@ class SchoolClassCard extends React.Component<TProps> {
     }
     return (
       <div onClick={this.props.selectEvent}>
-        <Card tokens={cardTokens}>
+        <Card className="choiceCard" tokens={cardTokens}>
           <Card.Item>
             <div>{this.props.schoolClass.school}</div>
             <div>{this.props.schoolClass.classNumber}</div>

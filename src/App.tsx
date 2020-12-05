@@ -36,6 +36,10 @@ function App ({ username, logout }: any) {
       component: ClassSessionCreator
     },
     {
+      path: '/classSession/edit/:classSessionId',
+      component: ClassSessionCreator
+    },
+    {
       path: '/classSession/:id',
       component: ClassSession
     },
