@@ -58,7 +58,7 @@ function App ({ username, logout }: any) {
   return (
     <Router>
       <Stack horizontal styles={stackStyles} horizontalAlign={'space-between'}>
-        <Stack horizontal >
+        <Stack horizontal>
           <CommandBarButton
             text="Sesje zadań"
             href="/home"

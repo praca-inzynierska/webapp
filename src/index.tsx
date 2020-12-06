@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import rootReducer from './reducers'
 import { loadState, saveState } from './util/localStorage'
 import api from './util/api'
+import Notifications, { notify } from 'react-notify-toast'
 import { logout } from './actions/index'
 // import * as serviceWorker from './serviceWorker';
 
@@ -17,11 +18,14 @@ if (auth.token !== undefined) api.defaults.headers.Token = auth.token
 api.interceptors.response.use(function (response) {
   return response
 }, function (error) {
-  if (error.response.status === 401) {
-    store.dispatch(logout())
-    window.location.assign('/login')
-  } else {
-    return Promise.reject(error)
+  if (error.response) {
+    if (error.response.status === 401) {
+      store.dispatch(logout())
+      window.location.assign('/login')
+    } else {
+      notify.show(`Błąd: ${error.message}`, 'error')
+      return Promise.reject(error)
+    }
   }
 })
 store.subscribe(() => {
@@ -33,6 +37,7 @@ store.subscribe(() => {
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
+      <Notifications/>
       <App/>
     </Provider>
   </React.StrictMode>,

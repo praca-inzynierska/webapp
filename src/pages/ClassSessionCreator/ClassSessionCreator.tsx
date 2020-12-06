@@ -2,7 +2,7 @@ import React, { ComponentProps, FormEvent } from 'react'
 import { withRouter } from 'react-router'
 import Student from '../../model/Student'
 import SchoolClass from '../../model/SchoolClass'
-import _ from 'lodash'
+import { notify } from 'react-notify-toast'
 import SchoolClassCard from './SchoolClassCard'
 import api from '../../util/api'
 import School from '../../model/School'
@@ -29,6 +29,7 @@ class ClassSessionCreator extends React.Component<TProps> {
     super(props)
     this.handleSelection = this.handleSelection.bind(this)
     this.handleSessionCreate = this.handleSessionCreate.bind(this)
+    this.handleSessionDelete = this.handleSessionDelete.bind(this)
     this.onDateChange = this.onDateChange.bind(this)
     this.onSpinButtonDecrement = this.onSpinButtonDecrement.bind(this)
     this.onSpinButtonIncrement = this.onSpinButtonIncrement.bind(this)
@@ -52,38 +53,44 @@ class ClassSessionCreator extends React.Component<TProps> {
       .then(response => this.setState(() => {
         const schools: School[] = response.data.map((it: any) => School.fromResponse(it))
         const schoolClasses: SchoolClass[] = schools.reduce((acc: SchoolClass[], school: School) => acc.concat(school.classes), [])
+        return { schoolClasses }
+      }))
+      .then(() => {
+        this.setState(() => {
+          const newChosenSchoolClasses = this.state.chosenSchoolClasses
+          this.state.schoolClasses.forEach((schoolClass) => {
+            newChosenSchoolClasses.set(schoolClass, false)
+          })
+          return { chosenSchoolClasses: newChosenSchoolClasses }
+        })
         if (this.props.match.params.classSessionId != null) {
           api.get(`/classSessions/${this.props.match.params.classSessionId}`)
             .then(response => this.setState(() => {
               const classSession: ClassSessionModel = response.data
               const studentsMap = new Map<number, SchoolClass>()
               const chosenSchoolClasses = this.state.chosenSchoolClasses
-              schoolClasses.forEach((schoolClass) => {
+              this.state.schoolClasses.forEach((schoolClass) => {
                 schoolClass.students.forEach(student => studentsMap.set(student.id, schoolClass))
-                chosenSchoolClasses.set(schoolClass, false)
               })
               response.data.students
                 .map((value: Student) => studentsMap.get(value.id))
                 .forEach((value: SchoolClass) => chosenSchoolClasses.set(value, true))
               return {
-                from: classSession.startDate * 1000,
-                to: classSession.endDate * 1000,
+                from: classSession.startDate,
+                to: classSession.endDate,
                 students: classSession.students,
                 chosenSchoolClasses: chosenSchoolClasses
               }
             }))
         }
-        return { schoolClasses }
-      }))
+      })
   }
 
   handleSelection (schoolClass: SchoolClass) {
     this.setState((prevState: any) => {
       const newSelected: Map<SchoolClass, boolean> = new Map<SchoolClass, boolean>(prevState.chosenSchoolClasses)
-      const newSchoolClasses = Array.from(this.state.schoolClasses)
       newSelected.set(schoolClass, !newSelected.get(schoolClass))
-      _.remove(newSchoolClasses, (sc) => sc === schoolClass)
-      return { chosenSchoolClasses: newSelected, schoolClasses: newSchoolClasses }
+      return { chosenSchoolClasses: newSelected }
     })
   }
 
@@ -101,9 +108,23 @@ class ClassSessionCreator extends React.Component<TProps> {
       startDate: this.state.from,
       endDate: this.state.to
     }
-    api.post('/classSessions/create', data, {
+    const classSessionId = this.props.match.params.classSessionId
+    api.post(`/classSessions/${(classSessionId != null) ? 'edit/123' : 'create'}`, data, {
       headers: headers
     })
+      .then(response => {
+        notify.show('Sesja zadań zapisana pomyślnie', 'success')
+        this.props.history.push(`/classSession/${response.data.id}`)
+      })
+  }
+
+  handleSessionDelete () {
+    const classSessionId = this.props.match.params.classSessionId
+    api.get(`/classSessions/delete/${classSessionId}`)
+      .then(() => {
+        notify.show('Sesja zadań usunięta pomyślnie', 'success')
+        this.props.history.push('/home')
+      })
   }
 
   getTime (value: string) {
@@ -148,7 +169,11 @@ class ClassSessionCreator extends React.Component<TProps> {
   }
 
   onDateChange (date: Date | null | undefined) {
-    this.setState({ from: date?.getTime() })
+    const newFrom = new Date(this.state.from)
+    const newTo = new Date(this.state.to)
+    newFrom.setFullYear(date?.getUTCFullYear()!!, date?.getMonth(), date?.getDate())
+    newTo.setFullYear(date?.getUTCFullYear()!!, date?.getMonth(), date?.getDate())
+    this.setState({ from: newFrom.getTime(), to: newTo.getTime() })
   }
 
   formatDate (date?: Date): string {
@@ -179,7 +204,7 @@ class ClassSessionCreator extends React.Component<TProps> {
             <Stack.Item shrink={1}>
               <SpinButton
                 label={'Od'}
-                value={moment(this.state.to).format('hh:mm')}
+                value={moment(this.state.from).format('HH:mm')}
                 onValidate={this.onSpinButtonValidate}
                 onIncrement={this.onSpinButtonIncrement}
                 onDecrement={this.onSpinButtonDecrement}
@@ -189,7 +214,7 @@ class ClassSessionCreator extends React.Component<TProps> {
             <Stack.Item shrink={1}>
               <SpinButton
                 label={'Do'}
-                value={moment(this.state.to).format('hh:mm')}
+                value={moment(this.state.to).format('HH:mm')}
                 onValidate={this.onSpinButtonValidate}
                 onIncrement={this.onSpinButtonIncrement}
                 onDecrement={this.onSpinButtonDecrement}
@@ -199,6 +224,11 @@ class ClassSessionCreator extends React.Component<TProps> {
             <Stack.Item>
               <PrimaryButton onClick={this.handleSessionCreate}>
                 Zapisz sesję
+              </PrimaryButton>
+            </Stack.Item>
+            <Stack.Item>
+              <PrimaryButton onClick={this.handleSessionDelete}>
+                Usuń sesję
               </PrimaryButton>
             </Stack.Item>
           </Stack>
@@ -213,7 +243,8 @@ class ClassSessionCreator extends React.Component<TProps> {
                     .filter(it => !it[1])
                     .map(schoolClassEntry => schoolClassEntry[0])
                     .map((schoolClass, index) => (
-                      <SchoolClassCard key={index} schoolClass={schoolClass} selectEvent={() => this.handleSelection(schoolClass)} />
+                      <SchoolClassCard key={index} schoolClass={schoolClass}
+                        selectEvent={() => this.handleSelection(schoolClass)}/>
                     ))}
                 </Stack>
               </Stack>
@@ -228,7 +259,8 @@ class ClassSessionCreator extends React.Component<TProps> {
                     .filter(it => it[1])
                     .map(schoolClassEntry => schoolClassEntry[0])
                     .map((schoolClass, index) => (
-                      <SchoolClassCard key={index} schoolClass={schoolClass} selectEvent={() => this.handleSelection(schoolClass)} />
+                      <SchoolClassCard key={index} schoolClass={schoolClass}
+                        selectEvent={() => this.handleSelection(schoolClass)}/>
                     ))}
                 </Stack>
               </Stack>
