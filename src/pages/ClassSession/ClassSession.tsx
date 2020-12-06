@@ -38,6 +38,11 @@ class ClassSession extends React.Component<ComponentProps<any>> {
     this.setState({ taskSessions: taskSessions, started: true })
   }
 
+  removeSession () {
+    api.get(`classSessions/${this.props.match.params.id}`)
+      .then(response => this.setState({ classSession: ClassSessionModel.fromResponse(response.data), started: true }))
+  }
+
   showFilteredTasks (func: (group: TaskSessionModel) => boolean) {
     const stackTokens = { childrenGap: 10, padding: 10 }
     const stackItemStyles = {
@@ -52,7 +57,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
             .filter(func)
             .map((group: TaskSessionModel, index: number) => (
               <Stack.Item styles={stackItemStyles} align={'center'} key={index}>
-                <TaskSessionCard taskGroup={group}/>
+                <TaskSessionCard taskGroup={group} deleteEvent={() => this.removeSession()}/>
               </Stack.Item>
             ))}
         </Stack>

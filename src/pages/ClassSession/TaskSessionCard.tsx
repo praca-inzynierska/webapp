@@ -4,20 +4,31 @@ import React from 'react'
 import './StudentCard.css'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import { RouteComponentProps, withRouter } from 'react-router'
+import { notify } from 'react-notify-toast'
+import api from '../../util/api'
 
 type TProps = RouteComponentProps & {
   taskGroup: TaskSessionModel
+  deleteEvent: () => any
 }
 
 class TaskSessionCard extends React.Component<TProps> {
   constructor (props: any) {
     super(props)
     this.openTaskSession = this.openTaskSession.bind(this)
+    this.removeTaskSession = this.removeTaskSession.bind(this)
   }
 
   openTaskSession () {
     const taskSessionId = this.props.taskGroup.id
     this.props.history.push(`/taskSession/${taskSessionId}`)
+  }
+
+  removeTaskSession () {
+    const taskSessionId = this.props.taskGroup.id
+    api.get(`/taskSessions/delete/${taskSessionId}`)
+      .then(() => notify.show('Sesja zadania usunięta pomyślnie', 'success'))
+      .then(() => this.props.deleteEvent())
   }
 
   render () {
@@ -50,9 +61,7 @@ class TaskSessionCard extends React.Component<TProps> {
             </Card.Section>
             <Card.Section>
               <DefaultButton onClick={this.openTaskSession}>Otwórz sesję</DefaultButton>
-              {taskSession.readyToRate
-                ? (<DefaultButton>Oceń zadanie</DefaultButton>)
-                : null}
+              <DefaultButton onClick={this.removeTaskSession}>Usuń sesję</DefaultButton>
             </Card.Section>
           </Card>
           <br/>
