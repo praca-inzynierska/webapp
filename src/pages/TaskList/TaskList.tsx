@@ -49,44 +49,6 @@ class TaskList extends React.Component<ComponentProps<any>> {
 
     this.state = {
       tasks: []
-      // tasks: [
-      //   {
-      //     id: '1',
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      //   {
-      //     id: '1',
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      //   {
-      //     id: 3,
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      //   {
-      //     id: 4,
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      // ].map(taskResponseMock => Task.fromResponse(taskResponseMock))
     }
   }
 
@@ -124,52 +86,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
         <DetailsList
           items={this.state.tasks}
           columns={this._columns}
-          // setKey="set"
-          // layoutMode={DetailsListLayoutMode.justified}
-          // selection={this._selection}
-          // selectionPreservedOnEmptyClick={true}
-          // ariaLabelForSelectionColumn="Toggle selection"
-          // ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-          // checkButtonAriaLabel="Row checkbox"
-          // onItemInvoked={this._onItemInvoked}
         />
-        {/* <Table> */}
-        {/*  <thead> */}
-        {/*  <tr> */}
-        {/*    <th>Tytuł</th> */}
-        {/*    <th>Przedmiot</th> */}
-        {/*    <th>Typ</th> */}
-        {/*    <th>Czas trwania</th> */}
-        {/*    <th>Działania</th> */}
-        {/*  </tr> */}
-        {/*  </thead> */}
-        {/*  <tfoot> */}
-        {/*  <tr> */}
-        {/*    <th>Tytuł</th> */}
-        {/*    <th>Przedmiot</th> */}
-        {/*    <th>Typ</th> */}
-        {/*    <th>Czas trwania</th> */}
-        {/*    <th>Działania</th> */}
-        {/*  </tr> */}
-        {/*  </tfoot> */}
-        {/*  <tbody> */}
-        {/*  {state.tasks.map((task, key) => ( */}
-        {/*    <tr key={key}> */}
-        {/*      <td> */}
-        {/*        {task.id} {task.name} */}
-        {/*      </td> */}
-        {/*      <td>{task.subject}</td> */}
-        {/*      <td>{task.type}</td> */}
-        {/*      <td>{task.minutes} minut</td> */}
-        {/*      <td> */}
-        {/*        <Button color="info" onClick={() => this.editTask(task.id)}> */}
-        {/*          Edytuj */}
-        {/*        </Button> */}
-        {/*      </td> */}
-        {/*    </tr> */}
-        {/*  ))} */}
-        {/*  </tbody> */}
-        {/* </Table> */}
 
         <PrimaryButton onClick={this.createTask}>
           Dodaj nowe zadanie

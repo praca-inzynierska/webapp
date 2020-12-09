@@ -12,6 +12,7 @@ import HomePage from './pages/HomePage/HomePage'
 import ClassSessionCreator from './pages/ClassSessionCreator/ClassSessionCreator'
 import api from './util/api'
 import { CommandBarButton, initializeIcons, IStackStyles, Persona, PersonaSize, Stack } from 'office-ui-fabric-react'
+import { loadTheme } from '@fluentui/react'
 
 function App ({ username, logout }: any) {
   const routes = [
