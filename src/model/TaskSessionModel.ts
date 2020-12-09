@@ -5,23 +5,23 @@ export default class TaskSessionModel {
   students: Student[]
   task: Task
   id: number
-  finished: boolean
+  readyToRate: boolean
   needsHelp: boolean
   deadline: number
   grade: number | null
 
-  constructor (students: Student[], task: Task, id: number, deadline: number) {
+  constructor (students: Student[], task: Task, id: number, deadline: number, needsHelp: boolean, finished: boolean) {
     this.students = students
     this.task = task
     this.id = id
-    this.finished = false
+    this.readyToRate = finished
     this.deadline = deadline
-    this.needsHelp = false
+    this.needsHelp = needsHelp
     this.grade = null
   }
 
   markAsFinished () {
-    this.finished = true
+    this.readyToRate = true
   }
 
   markAsNeedsHelp () {
@@ -29,10 +29,10 @@ export default class TaskSessionModel {
   }
 
   static fromResponse (data: any): TaskSessionModel {
-    return new TaskSessionModel(data.students, Task.fromResponse(data.task), data.id, data.deadline * 1000)
+    return new TaskSessionModel(data.students, Task.fromResponse(data.task), data.id, data.deadline * 1000, data.needsHelp, data.readyToRate)
   }
 
   static empty (): TaskSessionModel {
-    return new TaskSessionModel([], Task.emptyTask(), -1, Date.now())
+    return new TaskSessionModel([], Task.emptyTask(), -1, Date.now(), false, false)
   }
 }

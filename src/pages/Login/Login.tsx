@@ -1,8 +1,7 @@
-import React, { ComponentProps } from 'react'
+import React, { ComponentProps, FormEvent } from 'react'
 import api from '../../util/api'
-import { Box, Button, Container, Tabs } from 'react-bulma-components'
 import { withRouter } from 'react-router'
-import { Checkbox, Control, Field, Input, Label } from 'react-bulma-components/lib/components/form'
+import { Checkbox, Pivot, PivotItem, PrimaryButton, Stack, TextField } from 'office-ui-fabric-react'
 import { connect } from 'react-redux'
 import { login } from '../../actions'
 
@@ -59,108 +58,89 @@ class Login extends React.Component<ComponentProps<any>> {
       .catch(e => console.log(e))
   }
 
-  onInputChange (event: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({ [event.target.name]: event.target.value })
+  onInputChange (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const target = (event!.target as HTMLInputElement)
+    this.setState({ [target.name]: target.value })
   }
 
-  onCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ [event.target.name]: event.target.checked })
+  onCheckboxChange = (event?: FormEvent<HTMLInputElement | HTMLElement> | undefined, checked?: boolean | undefined) => {
+    const target = (event!.target as HTMLInputElement)
+    this.setState({ [target.name]: checked })
   }
 
   render () {
     const { state } = this
+    const stackTokens = { childrenGap: 10, padding: 10 }
     return (
       <div className="page">
-        <Container>
-          <Tabs
-            fullwidth={true}
-          >
-            <Tabs.Tab active={state.isLogin} onClick={() => this.setState({ isLogin: true })}>
-            Logowanie
-            </Tabs.Tab>
-            <Tabs.Tab active={!state.isLogin} onClick={() => this.setState({ isLogin: false })}>
-            Rejestracja
-            </Tabs.Tab>
-          </Tabs>
-          <Field>
-            <Label>Login</Label>
-            <Control>
-              <Input
-                onChange={this.onInputChange}
-                name="username"
-                placeholder="Login"
-                value={state.username}
-              />
-            </Control>
-          </Field>
-          <Field>
-            <Label>Hasło</Label>
-            <Control>
-              <Input
-                onChange={this.onInputChange}
-                name="password"
-                placeholder="Hasło"
-                value={state.password}
-                type="password"
-              />
-            </Control>
-          </Field>
-          {!state.isLogin ? (
-            <div>
-              <Field>
-                <Label>Email</Label>
-                <Control>
-                  <Input
-                    onChange={this.onInputChange}
-                    name="email"
-                    placeholder="Email"
-                    value={state.email}
-                    type="email"
-                  />
-                </Control>
-              </Field>
-              <Field>
-                <Label>Imię</Label>
-                <Control>
-                  <Input
-                    onChange={this.onInputChange}
-                    name="firstName"
-                    placeholder="Imię"
-                    value={state.firstName}
-                    type="firstName"
-                  />
-                </Control>
-              </Field>
-              <Field>
-                <Label>Nazwisko</Label>
-                <Control>
-                  <Input
-                    onChange={this.onInputChange}
-                    name="lastName"
-                    placeholder="Nazwisko"
-                    value={state.lastName}
-                    type="lastName"
-                  />
-                </Control>
-              </Field>
-              <Field>
+        <Stack tokens={stackTokens}>
+          <Pivot aria-label="Basic Pivot Example">
+            <PivotItem headerText="Logowanie">
+              <Stack tokens={stackTokens}>
+                <TextField
+                  onChange={this.onInputChange}
+                  name="username"
+                  placeholder="Login"
+                  value={state.username}
+                />
+                <TextField
+                  onChange={this.onInputChange}
+                  name="password"
+                  placeholder="Hasło"
+                  value={state.password}
+                  type="password"
+                />
+              </Stack>
+            </PivotItem>
+            <PivotItem headerText="Rejestracja">
+              <Stack tokens={stackTokens}>
+                <TextField
+                  onChange={this.onInputChange}
+                  name="username"
+                  placeholder="Login"
+                  value={state.username}
+                />
+                <TextField
+                  onChange={this.onInputChange}
+                  name="password"
+                  placeholder="Hasło"
+                  value={state.password}
+                  type="password"
+                />
+                <TextField
+                  onChange={this.onInputChange}
+                  name="email"
+                  placeholder="Email"
+                  value={state.email}
+                  type="email"
+                />
+                <TextField
+                  onChange={this.onInputChange}
+                  name="firstName"
+                  placeholder="Imię"
+                  value={state.firstName}
+                  type="firstName"
+                />
+                <TextField
+                  onChange={this.onInputChange}
+                  name="lastName"
+                  placeholder="Nazwisko"
+                  value={state.lastName}
+                  type="lastName"
+                />
                 <Checkbox
                   name="isTeacher"
                   onChange={this.onCheckboxChange}
                   checked={state.isTeacher}
-                >
-                Nauczyciel
-                </Checkbox>
-              </Field>
-            </div>
-          ) : ''}
-
-          <Box>
-            <Button color="success" onClick={this.handleConfirm}>
-              {state.isLogin ? 'Zaloguj' : 'Zarejestruj'}
-            </Button>
-          </Box>
-        </Container>
+                  label="Nauczyciel"
+                />
+              </Stack>
+            </PivotItem>
+          </Pivot>
+          <PrimaryButton onClick={this.handleConfirm}>
+            {state.isLogin ? 'Zaloguj' : 'Zarejestruj'}
+          </PrimaryButton>
+        </Stack>
       </div>
     )
   }

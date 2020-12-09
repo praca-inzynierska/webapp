@@ -1,6 +1,6 @@
 import Whiteboard from '../components/tools/Whiteboard'
-import { Component } from 'react'
-import Test from '../components/tools/Test'
+import React from 'react'
+import Chat from '../components/tools/Chat'
 
 export enum ToolType {
   Communication,
@@ -8,39 +8,27 @@ export enum ToolType {
 }
 
 export class ToolModel {
-  name: string
+  toolId: string
   displayName: string
   type: ToolType
-  tag: string
+  component: typeof React.Component
 
-  constructor (id: string, name: string, type: ToolType, tag: string) {
-    this.name = id
+  constructor (toolId: string, name: string, type: ToolType, component: typeof React.Component) {
+    this.toolId = toolId
     this.displayName = name
     this.type = type
-    this.tag = tag
+    this.component = component
   }
 
-  static WHITEBOARD = new ToolModel('whiteboard', 'Tablica', ToolType.Task, 'Whiteboard')
-  static TEST = new ToolModel('test', 'Test', ToolType.Task, 'Test') // TODO: not implemented
-  static CHAT = new ToolModel('textChat', 'Czat', ToolType.Communication, 'Chat') // TODO: not implemented
-  static VOICECHAT = new ToolModel('voice-chat', 'Czat głosowy', ToolType.Communication, 'VoiceChat') // TODO: not implemented
-
   static getById (toolId: string) {
-    return [...this.taskTools, ...this.communicationTools].findByKey('name', toolId)
+    return [...this.taskTools, ...this.communicationTools].findByKey('toolId', toolId)
   }
 
   static taskTools: ToolModel[] = [
-    ToolModel.WHITEBOARD,
-    ToolModel.TEST
+    new ToolModel('whiteboard', 'Tablica', ToolType.Task, Whiteboard),
   ]
 
   static communicationTools: ToolModel[] = [
-    ToolModel.CHAT,
-    ToolModel.VOICECHAT
+    new ToolModel('textChat', 'Czat', ToolType.Communication, Chat),
   ]
-}
-
-export const toolComponents : {[key: string]: typeof Component} = {
-  Whiteboard,
-  Test
 }

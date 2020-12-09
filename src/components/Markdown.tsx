@@ -1,13 +1,19 @@
 import React, { ComponentProps } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Heading } from 'react-bulma-components'
+import { Text } from 'office-ui-fabric-react'
 
 type TProps = {
   source: string
 }
 
+const textHeaders: any = [
+  'xxLarge',
+  'xLarge',
+  'large',
+]
+
 function HeadingWrapper (props: ComponentProps<any>) {
-  return <Heading size={props.level}>{props.children}</Heading>
+  return <Text block variant={textHeaders[props.level - 1]}>{props.children}</Text>
 }
 
 const renderers = {

@@ -13,7 +13,7 @@ const classes = [1, 2, 3]
 const mockStudents: Student[] = names.map((name, index) => new Student(index, `${name} ${surnames[index % surnames.length]}`, schools[index % schools.length], classes[index % classes.length]))
 
 const mockTaskData = new TestData([new TestQuestion('Pytanie', 'Odpowiedz')])
-const mockTask: Task = new Task(null, 'zadanie', 'opis', 'matematyka', 'whiteboard', 60, new Map([['task', true]]), mockTaskData)
+const mockTask: Task = new Task(null, 'zadanie', 'opis', 'matematyka', 'whiteboard', '60', new Map([['task', true]]), mockTaskData)
 
 const mockTaskSessions: TaskSessionModel[] = []
 const studentsCopy = Array.from(mockStudents)
@@ -23,7 +23,9 @@ while (studentsCopy.length > 0) {
       studentsCopy.splice(0, 5),
       mockTask,
       123123,
-      moment(Date.now()).add(1, 'hours').toDate().getTime()
+      moment(Date.now()).add(1, 'hours').toDate().getTime(),
+      false,
+      false
     ))
 }
 mockTaskSessions.slice(0, 5).forEach(session => session.markAsFinished())

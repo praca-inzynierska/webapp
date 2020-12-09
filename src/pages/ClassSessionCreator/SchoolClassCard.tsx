@@ -1,4 +1,5 @@
-import { Card } from 'react-bulma-components'
+import { Card, ICardTokens } from '@uifabric/react-cards'
+import './SchoolClassCard.css'
 import React from 'react'
 import SchoolClass from '../../model/SchoolClass'
 
@@ -9,13 +10,18 @@ type TProps = {
 
 class SchoolClassCard extends React.Component<TProps> {
   render () {
+    const cardTokens: ICardTokens = {
+      childrenMargin: 10,
+      maxWidth: 400,
+      minWidth: 50,
+    }
     return (
       <div onClick={this.props.selectEvent}>
-        <Card>
-          <Card.Content>
+        <Card className="choiceCard" tokens={cardTokens}>
+          <Card.Item>
             <div>{this.props.schoolClass.school}</div>
             <div>{this.props.schoolClass.classNumber}</div>
-          </Card.Content>
+          </Card.Item>
         </Card>
       </div>
     )
