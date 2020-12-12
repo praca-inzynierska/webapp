@@ -3,13 +3,15 @@ const auth = (state = [], action: any) => {
     case 'LOGIN':
       return ({
         token: action.token,
-        username: action.username
+        username: action.username,
+        isTeacher: action.isTeacher
       })
 
     case 'LOGOUT':
       return ({
         token: undefined,
-        username: undefined
+        username: undefined,
+        isTeacher: false,
       })
 
     default:

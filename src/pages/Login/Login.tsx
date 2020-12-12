@@ -52,8 +52,8 @@ class Login extends React.Component<ComponentProps<any>> {
       .then((response) => {
         const { history } = this.props
         api.defaults.headers.Token = response.data.token
-        this.props.login(response.data.token, response.data.username)
-        history.push('/tasks')
+        this.props.login(response.data.token, response.data.username, response.data.isTeacher)
+        history.push('/home')
       })
       .catch(e => console.log(e))
   }

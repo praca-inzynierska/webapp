@@ -2,17 +2,20 @@ import React, { ComponentProps } from 'react'
 import { withRouter } from 'react-router'
 import ClassSessionModel from '../../model/ClassSessionModel'
 import api from '../../util/api'
-import { DefaultButton, DetailsList, IColumn, PrimaryButton, Text, Stack } from 'office-ui-fabric-react'
+import { DefaultButton, DetailsList, IColumn, PrimaryButton, Stack, Text } from 'office-ui-fabric-react'
 import moment from 'moment'
 import Teacher from '../../model/Teacher'
 import TaskSessionModel from '../../model/TaskSessionModel'
 import 'moment/locale/pl'
-import Student from '../../model/Student'
-import { Task } from '../../model/Task'
+import { connect } from 'react-redux'
 
 type TState = {
   classSessions: IClassSessionListItem[]
   taskSessions: ITaskSessionListItem[]
+}
+
+type TProps = ComponentProps<any> & {
+  isTeacher: boolean
 }
 
 interface IClassSessionListItem {
@@ -32,7 +35,7 @@ interface ITaskSessionListItem {
   timeLeft: string;
 }
 
-class HomePage extends React.Component<ComponentProps<any>> {
+class HomePage extends React.Component<TProps> {
   readonly state: TState
   private readonly _columns: IColumn[]
   private readonly _taskSessionsColumns: IColumn[]
@@ -41,6 +44,7 @@ class HomePage extends React.Component<ComponentProps<any>> {
     super(props)
     this.openSessionCreator = this.openSessionCreator.bind(this)
     this.openSession = this.openSession.bind(this)
+    this.openTaskSession = this.openTaskSession.bind(this)
     this.state = {
       taskSessions: [],
       classSessions: []
@@ -50,18 +54,20 @@ class HomePage extends React.Component<ComponentProps<any>> {
       { key: 'column2', name: 'Od', fieldName: 'from', minWidth: 100, maxWidth: 200, isResizable: true },
       { key: 'column3', name: 'Do', fieldName: 'to', minWidth: 100, maxWidth: 200, isResizable: true },
       { key: 'column4', name: 'Uczniowie', fieldName: 'students', minWidth: 100, maxWidth: 200, isResizable: true },
-      { key: 'column5', name: 'Nauczyciel', fieldName: 'teacher', minWidth: 100, isResizable: true },
+      { key: 'column5', name: 'Nauczyciel', fieldName: 'teacher', minWidth: 100, maxWidth: 200, isResizable: true },
       {
         key: 'column6',
         name: '',
         fieldName: '',
         minWidth: 200,
-        isResizable: true,
+        maxWidth: 200,
         onRender: (item: IClassSessionListItem) => {
-          return <div>
+          return <Stack horizontal tokens={{
+            childrenGap: 15,
+          }}>
             <DefaultButton onClick={() => this.openSession(item.id)}>Otwórz</DefaultButton>
-            <DefaultButton onClick={() => this.editSession(item.id)}>Edytuj</DefaultButton>
-          </div>
+            {this.props.isTeacher ? <DefaultButton onClick={() => this.editSession(item.id)}>Edytuj</DefaultButton> : <div/> }
+          </Stack>
         },
       },
     ]
@@ -70,17 +76,18 @@ class HomePage extends React.Component<ComponentProps<any>> {
       { key: 'column1', name: '#', fieldName: 'key', minWidth: 25, maxWidth: 25, isResizable: false },
       { key: 'column2', name: 'Nazwa', fieldName: 'taskName', minWidth: 100, maxWidth: 200, isResizable: true },
       { key: 'column3', name: 'Termin zakończenia', fieldName: 'deadline', minWidth: 100, maxWidth: 200, isResizable: true },
-      { key: 'column3', name: 'Pozostało', fieldName: 'timeLeft', minWidth: 100, maxWidth: 200, isResizable: true },
+      { key: 'column4', name: 'Pozostało', fieldName: 'timeLeft', minWidth: 100, maxWidth: 200, isResizable: true },
+      { key: 'column5', name: '', fieldName: '', minWidth: 200, maxWidth: 200, isResizable: true },
       {
-        key: 'column5',
+        key: 'column6',
         name: '',
         fieldName: '',
         minWidth: 200,
-        isResizable: true,
+        maxWidth: 200,
+        isPadded: true,
         onRender: (item: ITaskSessionListItem) => {
           return <div>
-            <DefaultButton onClick={() => this.openSession(item.id)}>Otwórz</DefaultButton>
-            <DefaultButton onClick={() => this.editSession(item.id)}>Edytuj</DefaultButton>
+            <DefaultButton onClick={() => this.openTaskSession(item.id)}>Otwórz</DefaultButton>
           </div>
         },
       },
@@ -127,6 +134,10 @@ class HomePage extends React.Component<ComponentProps<any>> {
     this.props.history.push(`/classSession/${id}`)
   }
 
+  openTaskSession (id: number) {
+    this.props.history.push(`/taskSession/${id}`)
+  }
+
   editSession (id: number) {
     this.props.history.push(`/classSession/edit/${id}`)
   }
@@ -144,12 +155,11 @@ class HomePage extends React.Component<ComponentProps<any>> {
       <div className='page'>
         <Stack horizontal tokens={stackTokens} horizontalAlign={'space-between'} >
           <Text variant={'xxLargePlus'}> Sesje zajęć</Text>
-          <Stack.Item>
+          {this.props.isTeacher ? <Stack.Item>
             <PrimaryButton onClick={this.openSessionCreator}>
               Dodaj nową sesję zajęć
             </PrimaryButton>
-          </Stack.Item>
-
+          </Stack.Item> : <div/>}
         </Stack>
         <DetailsList
           items={this.state.classSessions}
@@ -166,4 +176,12 @@ class HomePage extends React.Component<ComponentProps<any>> {
   }
 }
 
-export default withRouter(HomePage)
+const mapStateToProps = (state: any) => ({
+  isTeacher: state.auth.isTeacher
+})
+
+const component = connect(
+  mapStateToProps,
+)(HomePage)
+
+export default withRouter(component)
