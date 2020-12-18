@@ -3,6 +3,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import '../../index.css'
 import '../../util/utils'
 import api from '../../util/api'
+import { notify } from 'react-notify-toast'
 
 import Subject from '../../model/Subject'
 import Markdown from '../../components/Markdown'
@@ -37,6 +38,9 @@ class TaskEditor extends React.Component<TProps> {
   private units: TimeUnit[]
   private taskTypes: TaskType[]
   private tools: ToolModel[]
+  private subjectOptions: IDropdownOption[]
+  private unitOptions: IDropdownOption[]
+  private taskTypeOptions: IDropdownOption[]
   readonly state: TState
 
   constructor (props: any) {
@@ -44,6 +48,7 @@ class TaskEditor extends React.Component<TProps> {
     this.onTitleChange = this.onTitleChange.bind(this)
     this.onClassChange = this.onClassChange.bind(this)
     this.onUnitChange = this.onUnitChange.bind(this)
+    this.onDurationChange = this.onDurationChange.bind(this)
     this.onToolChange = this.onToolChange.bind(this)
     this.onTaskTypeChange = this.onTaskTypeChange.bind(this)
     this.launchTask = this.launchTask.bind(this)
@@ -67,6 +72,9 @@ class TaskEditor extends React.Component<TProps> {
     this.tools = [
       ...ToolModel.communicationTools, ...ToolModel.taskTools
     ]
+    this.subjectOptions = this.subjects.map((item) => ({ key: item.id, text: item.name }))
+    this.unitOptions = this.units.map((item) => ({ key: item.id, text: item.name }))
+    this.taskTypeOptions = this.taskTypes.map((item) => ({ key: item.id, text: item.name }))
     this.state = {
       taskId,
       editedTask: Task.emptyTask(),
@@ -104,7 +112,7 @@ class TaskEditor extends React.Component<TProps> {
 
   onToolChange = (event?: FormEvent<HTMLInputElement | HTMLElement> | undefined, checked?: boolean | undefined) => {
     const target = (event!.target as HTMLInputElement)
-    this.setState(this.state.editedTask.tools.set(target.id, checked!))
+    this.setState(this.state.editedTask.tools.set(target.name, checked!))
     console.log(checked)
   }
 
@@ -126,6 +134,15 @@ class TaskEditor extends React.Component<TProps> {
     console.log(`${state.editedTask.subject} selected`)
   }
 
+  onDurationChange = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
+    console.log(parseInt(this.state.editedTask.minutes))
+    this.setState((prevState: TState) => {
+      const newEditedTask = prevState.editedTask
+      newEditedTask.minutes = (parseInt(value) + 10).toString()
+      return {editedTask: newEditedTask}
+    })
+  }
+
   onTaskTypeChange = (event: FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     const { state } = this
     this.deepSetState('editedTask', 'type', option?.key)
@@ -145,23 +162,21 @@ class TaskEditor extends React.Component<TProps> {
     const headers = {
       'Content-Type': 'application/json',
     }
-    if (id === null) {
-      api.post('/tasks/create', body, {
-        headers: headers
-      })
-    } else {
-      api.post(`/tasks/create/${id}`, body)
-    }
-    this.props.history.push('/tasks/')
+
+    api.post((id === null) ? '/tasks/create' : `/tasks/edit/${id}`, body, {
+      headers: headers
+    }).then(() => {
+      notify.show('Zadanie zapisane pomyślnie', 'success')
+      this.props.history.push('/tasks/')
+    })
+
   }
 
   render () {
     const { description, name, minutes } = this.state.editedTask
     const { state, subjects, taskTypes, units } = this
     const stackTokens = { childrenGap: 10 }
-    const subjectOptions: IDropdownOption[] = subjects.map((item) => ({ key: item.id, text: item.name }))
-    const unitOptions: IDropdownOption[] = units.map((item) => ({ key: item.id, text: item.name }))
-    const taskTypeOptions: IDropdownOption[] = taskTypes.map((item) => ({ key: item.id, text: item.name }))
+
     return (
       <div className="page">
         <Text variant='xLargePlus'>Tworzenie/edycja zadania</Text>
@@ -175,28 +190,30 @@ class TaskEditor extends React.Component<TProps> {
                 value={name}/>
               <Dropdown
                 onChange={this.onClassChange}
-                options={subjectOptions}
+                options={this.subjectOptions}
+                selectedKey={this.state.editedTask.subject}
                 label='Przedmiot'
               />
 
               <Stack horizontal tokens={stackTokens}>
                 <SpinButton
-                  value={minutes}
-                  defaultValue="0"
+                  value={minutes ? minutes : '0'}
                   label={'Czas trwania'}
                   min={0}
-                  step={10}
+                  onIncrement={this.onDurationChange}
+                  onDecrement={this.onDurationChange}
                 />
                 <Dropdown
                   onChange={this.onUnitChange}
                   placeholder={state.taskDurationUnit.name}
-                  options={unitOptions}
+                  options={this.unitOptions}
                 >
                 </Dropdown>
               </Stack>
               <Dropdown
-                options={taskTypeOptions}
+                options={this.taskTypeOptions}
                 onChange={this.onTaskTypeChange}
+                selectedKey={this.state.editedTask.type}
                 label="Typ zadania"
               />
               <Label style={{ paddingBottom: 0, marginBottom: 0 }}>Narzędzia</Label>

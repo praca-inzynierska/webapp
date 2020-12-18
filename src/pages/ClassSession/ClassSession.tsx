@@ -34,8 +34,8 @@ class ClassSession extends React.Component<ComponentProps<any>> {
       .then(response => this.setState({ classSession: ClassSessionModel.fromResponse(response.data), started: true }))
   }
 
-  startSessions (taskSessions: TaskSessionModel[]) {
-    this.setState({ taskSessions: taskSessions, started: true })
+  startSessions (classSession: ClassSessionModel) {
+    this.setState({ classSession: classSession, started: true, isModalOpen: false })
   }
 
   removeSession () {
@@ -43,7 +43,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
       .then(response => this.setState({ classSession: ClassSessionModel.fromResponse(response.data), started: true }))
   }
 
-  showFilteredTasks (func: (group: TaskSessionModel) => boolean) {
+  showFilteredTasks (func: (group: TaskSessionModel) => boolean, text: string) {
     const stackTokens = { childrenGap: 10, padding: 10 }
     const stackItemStyles = {
       root: {
@@ -52,6 +52,12 @@ class ClassSession extends React.Component<ComponentProps<any>> {
     }
     return (
       <div>
+        {(this.state.classSession.taskSessions as TaskSessionModel[])
+          .filter(func).length > 0 ? <Text
+            variant={'xxLarge'}>
+            {text}
+          </Text> : undefined}
+
         <Stack horizontal wrap tokens={stackTokens}>
           {(this.state.classSession.taskSessions as TaskSessionModel[])
             .filter(func)
@@ -91,18 +97,9 @@ class ClassSession extends React.Component<ComponentProps<any>> {
           <Text variant={'xxLargePlus'}>
             Sesje zadań:
           </Text>
-          <Text variant={'xxLarge'}>
-            Prośby o pomoc:
-          </Text>
-          {this.showFilteredTasks(group => group.needsHelp)}
-          <Text variant={'xxLarge'}>
-            Gotowe do oceny:
-          </Text>
-          {this.showFilteredTasks(group => group.readyToRate)}
-          <Text variant={'xxLarge'}>
-            W trakcie pracy:
-          </Text>
-          {this.showFilteredTasks(group => !group.readyToRate && !group.needsHelp)}
+          {this.showFilteredTasks(group => group.needsHelp, 'Prośby o pomoc')}
+          {this.showFilteredTasks(group => group.readyToRate, 'Gotowe do oceny')}
+          {this.showFilteredTasks(group => !group.readyToRate && !group.needsHelp, 'W trakcie pracy')}
         </Stack>
         <Modal
           isOpen={this.state.isModalOpen}
@@ -111,10 +108,10 @@ class ClassSession extends React.Component<ComponentProps<any>> {
           containerClassName={contentStyles.body}
         >
           <Stack horizontal horizontalAlign={'space-between'} tokens={stackTokens}>
-            <Text variant={'xxLargePlus'} >
+            <Text variant={'xxLargePlus'}>
               Tworzenie sesji zadań
             </Text>
-            <Stack.Item styles={{ root: { float: 'right' } }} >
+            <Stack.Item styles={{ root: { float: 'right' } }}>
               <IconButton
                 iconProps={{ iconName: 'Cancel' }}
                 ariaLabel="Close popup modal"
@@ -122,8 +119,9 @@ class ClassSession extends React.Component<ComponentProps<any>> {
               />
             </Stack.Item>
           </Stack>
-          <div >
-            <TaskSessionCreator students={(this.state.classSession.students as Student[])}
+          <div>
+            <TaskSessionCreator classSessionId={this.state.classSession.id}
+              students={(this.state.classSession.students as Student[])}
               onSessionCreate={this.startSessions}/>
           </div>
         </Modal>

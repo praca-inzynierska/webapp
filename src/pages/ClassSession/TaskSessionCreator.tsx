@@ -15,7 +15,7 @@ import _ from 'lodash'
 import { Task } from '../../model/Task'
 import api from '../../util/api'
 import TaskSessionModel from '../../model/TaskSessionModel'
-import { mockTaskSessions } from '../../util/mock'
+import ClassSessionModel from '../../model/ClassSessionModel'
 
 type TState = {
   students: Student[]
@@ -28,7 +28,8 @@ type TState = {
 }
 
 type TProps = {
-  onSessionCreate: (taskGroups: TaskSessionModel[]) => void
+  onSessionCreate: (classSession: ClassSessionModel) => void
+  classSessionId: number
   students: Student[]
 }
 
@@ -41,7 +42,8 @@ class TaskSessionCreator extends React.Component<TProps> {
     this.handleGroupCreate = this.handleGroupCreate.bind(this)
     this.handleRandomGroupsCreate = this.handleRandomGroupsCreate.bind(this)
     this.onCheckboxChange = this.onCheckboxChange.bind(this)
-    this.onInputChange = this.onInputChange.bind(this)
+    this.onIncrementChange = this.onIncrementChange.bind(this)
+    this.onDecrementChange = this.onDecrementChange.bind(this)
     this.handleStartSession = this.handleStartSession.bind(this)
 
     this.state = {
@@ -60,8 +62,16 @@ class TaskSessionCreator extends React.Component<TProps> {
     this.setState({ [target.name]: target.checked })
   }
 
-  onInputChange (event: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({ [event.target.name]: event.target.value })
+  onIncrementChange = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
+    this.setState(() => {
+      return { groupSize: (parseInt(value) + 1).toString() }
+    })
+  }
+
+  onDecrementChange = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
+    this.setState(() => {
+      return { groupSize: (parseInt(value) - 1).toString() }
+    })
   }
 
   handleSelection (student: Student) {
@@ -121,11 +131,11 @@ class TaskSessionCreator extends React.Component<TProps> {
   handleStartSession () {
     const sessionsToCreate = {
       taskId: this.state.selectedTaskId,
+      classSessionId: this.props.classSessionId,
       groups: this.state.groups.map(group => group.map(student => student.id))
     }
-    api.post('/sessions/create', sessionsToCreate)
-      .then((response) => this.props.onSessionCreate(response.data.groups))
-      .catch(() => this.props.onSessionCreate(mockTaskSessions))
+    api.post('/taskSessions/create', sessionsToCreate)
+      .then((response) => this.props.onSessionCreate(response.data))
   }
 
   componentDidMount () {
@@ -157,8 +167,10 @@ class TaskSessionCreator extends React.Component<TProps> {
               <SpinButton
                 styles={{ root: { width: 20 } }}
                 placeholder="Rozmiar grupy"
+                min={0}
                 value={this.state.groupSize}
-                onChange={this.onInputChange}/>
+                onIncrement={this.onIncrementChange}
+                onDecrement={this.onDecrementChange}/>
             </Stack.Item>
             <Stack.Item shrink={1} align={'center'}>
               <Checkbox

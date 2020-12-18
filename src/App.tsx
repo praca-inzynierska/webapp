@@ -60,7 +60,7 @@ function App ({ username, logout, isTeacher }: any) {
       <Stack horizontal styles={stackStyles} horizontalAlign={'space-between'}>
         <Stack horizontal>
           <CommandBarButton
-            text="Sesje zadań"
+            text="Sesje"
             href="/home"
           />
           {isTeacher ? <CommandBarButton

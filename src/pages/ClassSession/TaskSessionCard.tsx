@@ -34,8 +34,7 @@ class TaskSessionCard extends React.Component<TProps> {
   render () {
     const taskSession: TaskSessionModel = this.props.taskGroup
     const personas: IFacepilePersona[] = taskSession.students.map((it) => ({
-      personaName: it.name,
-      imageUrl: 'http://bulma.io/images/placeholders/640x480.png'
+      personaName: it.user.firstName + ' ' + it.user.lastName,
     })).copyWithin(5, 0, 2)
     const cardTokens: ICardTokens = {
       childrenMargin: 10,
@@ -53,10 +52,11 @@ class TaskSessionCard extends React.Component<TProps> {
                 {taskSession.task.name}
               </Text>
               <Facepile
-                personas={personas}
-                overflowPersonas={personas.slice(2)}
-                maxDisplayablePersonas={3}
-                overflowButtonType={OverflowButtonType.more}
+                personas={personas.slice(0, 3)}
+                overflowPersonas={personas.slice(3)}
+                maxDisplayablePersonas={4}
+                overflowButtonType={OverflowButtonType.descriptive}
+                overflowButtonProps={{ariaLabel: 'More'}}
               />
             </Card.Section>
             <Card.Section>

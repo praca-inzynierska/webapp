@@ -66,7 +66,8 @@ class HomePage extends React.Component<TProps> {
             childrenGap: 15,
           }}>
             <DefaultButton onClick={() => this.openSession(item.id)}>Otwórz</DefaultButton>
-            {this.props.isTeacher ? <DefaultButton onClick={() => this.editSession(item.id)}>Edytuj</DefaultButton> : <div/> }
+            {this.props.isTeacher ? <DefaultButton onClick={() => this.editSession(item.id)}>Edytuj</DefaultButton>
+              : <div/>}
           </Stack>
         },
       },
@@ -75,7 +76,14 @@ class HomePage extends React.Component<TProps> {
 
       { key: 'column1', name: '#', fieldName: 'key', minWidth: 25, maxWidth: 25, isResizable: false },
       { key: 'column2', name: 'Nazwa', fieldName: 'taskName', minWidth: 100, maxWidth: 200, isResizable: true },
-      { key: 'column3', name: 'Termin zakończenia', fieldName: 'deadline', minWidth: 100, maxWidth: 200, isResizable: true },
+      {
+        key: 'column3',
+        name: 'Termin zakończenia',
+        fieldName: 'deadline',
+        minWidth: 100,
+        maxWidth: 200,
+        isResizable: true
+      },
       { key: 'column4', name: 'Pozostało', fieldName: 'timeLeft', minWidth: 100, maxWidth: 200, isResizable: true },
       { key: 'column5', name: '', fieldName: '', minWidth: 200, maxWidth: 200, isResizable: true },
       {
@@ -99,33 +107,37 @@ class HomePage extends React.Component<TProps> {
       .then(response => {
         const newClassSessions: ClassSessionModel[] = response.data.map((item: any) => ClassSessionModel.fromResponse(item))
         this.setState({
-          classSessions: newClassSessions.map((it, index) => (
-            {
-              id: it.id,
-              key: index,
-              from: moment(it.startDate).format('LLLL'),
-              to: moment(it.endDate).format('LLLL'),
-              students: `${it.students.length} uczniów`,
-              teacher: `${(it.teacher as Teacher).user.firstName} ${(it.teacher as Teacher).user.lastName}`,
-            }
-          )
-          )
+          classSessions: newClassSessions
+            // .filter(it => moment(it.endDate).isBefore(Date.now()))
+            .map((it, index) => (
+              {
+                id: it.id,
+                key: index,
+                from: moment(it.startDate).format('LLLL'),
+                to: moment(it.endDate).format('LLLL'),
+                students: `${it.students.length} uczniów`,
+                teacher: `${(it.teacher as Teacher).user.firstName} ${(it.teacher as Teacher).user.lastName}`,
+              }
+            )
+            )
         })
       })
     api.get('/taskSessions')
       .then(response => {
         const newTaskSessions: TaskSessionModel[] = response.data.map((item: any) => TaskSessionModel.fromResponse(item))
         this.setState({
-          taskSessions: newTaskSessions.map((it, index) => (
-            {
-              id: it.id,
-              key: index,
-              taskName: it.task.name,
-              deadLine: moment(it.deadline).format('LLLL'),
-              timeLeft: moment(it.deadline).locale('pl').fromNow()
-            }
-          )
-          )
+          taskSessions: newTaskSessions
+            .filter(it => moment(it.deadline).isAfter(Date.now()))
+            .map((it, index) => (
+              {
+                id: it.id,
+                key: index,
+                taskName: it.task.name,
+                deadLine: moment(it.deadline).format('LLLL'),
+                timeLeft: moment(it.deadline).locale('pl').fromNow()
+              }
+            )
+            )
         })
       })
   }
@@ -153,7 +165,7 @@ class HomePage extends React.Component<TProps> {
 
     return (
       <div className='page'>
-        <Stack horizontal tokens={stackTokens} horizontalAlign={'space-between'} >
+        <Stack horizontal tokens={stackTokens} horizontalAlign={'space-between'}>
           <Text variant={'xxLargePlus'}> Sesje zajęć</Text>
           {this.props.isTeacher ? <Stack.Item>
             <PrimaryButton onClick={this.openSessionCreator}>

@@ -42,10 +42,10 @@ class Chat extends ToolWindow<ToolWindowProps> {
   render () {
     return (
       <div>
-        {this.state.messages.map(message => {
-          return (<div>{message.text}</div>)
-        })
-        }
+        {/*{this.state.messages.map(message => {*/}
+        {/*  return (<div>{message.text}</div>)*/}
+        {/*})*/}
+        {/*}*/}
       </div>
     )
   }
