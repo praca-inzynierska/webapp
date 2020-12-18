@@ -1,7 +1,7 @@
 import React, { ComponentProps } from 'react'
 import '../../index.css'
 import { DefaultButton, DetailsList, IColumn, PrimaryButton, Text } from 'office-ui-fabric-react'
-import { Task } from '../../model/Task'
+import { Task, TaskType } from '../../model/Task'
 import api from '../../util/api'
 import { withRouter } from 'react-router'
 
@@ -61,7 +61,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
             key: index,
             id: it.id,
             name: it.name,
-            type: it.type,
+            type: TaskType.taskTypes.findByKey('id', it.type).name,
             time: `${it.minutes} minut`
           }
         )

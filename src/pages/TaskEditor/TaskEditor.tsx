@@ -8,7 +8,7 @@ import { notify } from 'react-notify-toast'
 import Subject from '../../model/Subject'
 import Markdown from '../../components/Markdown'
 import { Task, TaskType, TimeUnit } from '../../model/Task'
-import { ToolModel } from '../../model/ToolModel'
+import { ToolModel, ToolType } from '../../model/ToolModel'
 import {
   Checkbox,
   DefaultButton,
@@ -30,7 +30,8 @@ type TState = {
   taskId: string,
   editedTask: Task,
   taskDurationUnit: TimeUnit,
-  markdownRender: boolean
+  markdownRender: boolean,
+  enabledTools: Map<string, boolean>
 };
 
 class TaskEditor extends React.Component<TProps> {
@@ -65,10 +66,7 @@ class TaskEditor extends React.Component<TProps> {
       new TimeUnit('hour', 'godzin', 60),
       new TimeUnit('minute', 'minut', 1),
     ]
-    this.taskTypes = [
-      new TaskType('whiteboard', 'Tablica'),
-      new TaskType('test', 'Test'),
-    ]
+    this.taskTypes = TaskType.taskTypes
     this.tools = [
       ...ToolModel.communicationTools, ...ToolModel.taskTools
     ]
@@ -79,8 +77,14 @@ class TaskEditor extends React.Component<TProps> {
       taskId,
       editedTask: Task.emptyTask(),
       taskDurationUnit: this.units.findByKey('id', 'minute'),
-      markdownRender: false
+      markdownRender: false,
+      enabledTools: new Map<string, boolean>()
     }
+    this.tools.forEach((tool) => this.state.enabledTools.set(tool.toolId, true))
+    this.taskTypes.findByKey('id', this.state.editedTask.type).requiredTools.forEach(tool => {
+      this.state.enabledTools.set(tool.toolId, false)
+      this.state.editedTask.tools.set(tool.toolId, true)
+    })
   }
 
   private deepSetState (editedProperty: string, editedNestedProperty: string, newValue: any) {
@@ -97,8 +101,17 @@ class TaskEditor extends React.Component<TProps> {
       api.get(`/tasks/${this.state.taskId}`)
         .then((response) => response.data)
         .then((data) => {
-          this.setState({
-            editedTask: Task.fromResponse(data),
+          this.setState(() => {
+            var enabledTools = this.state.enabledTools
+            var task = Task.fromResponse(data)
+            this.tools.forEach((tool) => enabledTools.set(tool.toolId, true))
+            this.taskTypes.findByKey('id', task.type).requiredTools.forEach(tool => {
+              enabledTools.set(tool.toolId, false)
+            })
+            return {
+              editedTask: task,
+              enabledTools: enabledTools
+            }
           })
         })
     }
@@ -139,13 +152,24 @@ class TaskEditor extends React.Component<TProps> {
     this.setState((prevState: TState) => {
       const newEditedTask = prevState.editedTask
       newEditedTask.minutes = (parseInt(value) + 10).toString()
-      return {editedTask: newEditedTask}
+      return { editedTask: newEditedTask }
     })
   }
 
   onTaskTypeChange = (event: FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     const { state } = this
-    this.deepSetState('editedTask', 'type', option?.key)
+    this.setState((prevState: TState) => {
+      var editedTask = prevState.editedTask
+      var enabledTools = prevState.enabledTools
+      var taskTypeId = option!.key.toString()
+      editedTask.type = taskTypeId
+      enabledTools.forEach((value, key) => enabledTools.set(key, true))
+      this.taskTypes.findByKey('id', taskTypeId).requiredTools.forEach((tool: ToolModel) => {
+        editedTask.tools.set(tool.toolId, true)
+        enabledTools.set(tool.toolId, false)
+      })
+      return { editedTask, enabledTools }
+    })
     console.log(`${state.editedTask.type} selected`)
   }
 
@@ -217,24 +241,19 @@ class TaskEditor extends React.Component<TProps> {
                 label="Typ zadania"
               />
               <Label style={{ paddingBottom: 0, marginBottom: 0 }}>Narzędzia</Label>
-              <Checkbox
-                name="textChat"
-                label="Czat tekstowy"
-                onChange={this.onToolChange}
-                checked={state.editedTask.tools.get('textChat')}
-              />
-              <Checkbox
-                name="whiteboard"
-                label="Tablica"
-                onChange={this.onToolChange}
-                checked={state.editedTask.tools.get('whiteboard')}
-              />
-              <Checkbox
-                name="voiceChat"
-                label="Czat głosowy"
-                onChange={this.onToolChange}
-                checked={state.editedTask.tools.get('voiceChat')}
-              />
+              {Array.from(this.state.enabledTools).map(([toolName, value]) => {
+                const tool = this.tools.findByKey('toolId', toolName)
+                return (
+                  <Checkbox
+                    key={toolName}
+                    name={tool.toolId}
+                    label={tool.displayName}
+                    onChange={this.onToolChange}
+                    checked={state.editedTask.tools.get(tool.toolId)}
+                    disabled={!value}
+                  />
+                )
+              })}
             </Stack>
             <Stack tokens={stackTokens} style={{ maxWidth: '50%' }} grow={1}>
               {this.state.markdownRender
