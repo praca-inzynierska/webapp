@@ -1,6 +1,6 @@
 import React, { ComponentProps } from 'react'
 import '../../index.css'
-import { DefaultButton, DetailsList, IColumn, PrimaryButton, Text } from 'office-ui-fabric-react'
+import { DefaultButton, DetailsList, IColumn, PrimaryButton, SelectionMode, Text } from 'office-ui-fabric-react'
 import { Task, TaskType } from '../../model/Task'
 import api from '../../util/api'
 import { withRouter } from 'react-router'
@@ -26,6 +26,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
   constructor (props: any) {
     super(props)
     this.editTask = this.editTask.bind(this)
+    this.deleteTask = this.deleteTask.bind(this)
     this.createTask = this.createTask.bind(this)
 
     this._allItems = []
@@ -39,10 +40,11 @@ class TaskList extends React.Component<ComponentProps<any>> {
         key: 'column5',
         name: '',
         fieldName: 'time',
-        minWidth: 100,
+        minWidth: 200,
         isResizable: true,
         onRender: (item: ITaskListItem) => {
-          return <DefaultButton onClick={() => this.editTask(item.id)}>Edytuj</DefaultButton>
+          return <div><DefaultButton onClick={() => this.editTask(item.id)}>Edytuj</DefaultButton>
+            <DefaultButton onClick={() => this.deleteTask(item.id)}>Usuń</DefaultButton></div>
         },
       },
     ]
@@ -74,6 +76,15 @@ class TaskList extends React.Component<ComponentProps<any>> {
     history.push(`/task/${id}`)
   }
 
+  deleteTask (id: string | null) {
+    const { history } = this.props
+    api.get(`tasks/delete/${id}`)
+      .then(() => {
+        history.push('/tasks')
+        this.componentDidMount()
+      })
+  }
+
   createTask () {
     const { history } = this.props
     history.push('/task/')
@@ -86,6 +97,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
         <DetailsList
           items={this.state.tasks}
           columns={this._columns}
+          selectionMode={SelectionMode.none}
         />
 
         <PrimaryButton onClick={this.createTask}>

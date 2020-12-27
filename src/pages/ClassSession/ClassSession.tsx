@@ -6,7 +6,7 @@ import TaskSessionCreator from './TaskSessionCreator'
 import TaskSessionCard from './TaskSessionCard'
 import ClassSessionModel from '../../model/ClassSessionModel'
 import api from '../../util/api'
-import Student from '../../model/Student'
+import Student, { StudentUser } from '../../model/Student'
 import { IconButton, Modal, PrimaryButton, Stack, Text, mergeStyleSets } from 'office-ui-fabric-react'
 
 type TState = {
@@ -121,7 +121,7 @@ class ClassSession extends React.Component<ComponentProps<any>> {
           </Stack>
           <div>
             <TaskSessionCreator classSessionId={this.state.classSession.id}
-              students={(this.state.classSession.students as Student[])}
+              students={(this.state.classSession.students as StudentUser[])}
               onSessionCreate={this.startSessions}/>
           </div>
         </Modal>

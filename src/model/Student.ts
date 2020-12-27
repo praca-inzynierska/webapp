@@ -18,10 +18,12 @@ export class StudentUser {
   user: User
   id: number
   grades: number[]
+  schoolName: string
 
-  constructor (user: User, id: number, grades: number[]) {
+  constructor (user: User, id: number, grades: number[], schoolName: string) {
     this.user = user
     this.id = id
     this.grades = grades
+    this.schoolName = schoolName
   }
 }

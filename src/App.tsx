@@ -71,7 +71,7 @@ function App ({ username, logout, isTeacher }: any) {
         </Stack>
 
         <Stack horizontal>
-          {isTeacher ? <CommandBarButton onClick={mockDataRequest}>Mock data</CommandBarButton> : <span/>}
+          <CommandBarButton onClick={mockDataRequest}>Mock data</CommandBarButton>
           {(username === undefined)
             ? <CommandBarButton href="/login">Zaloguj</CommandBarButton>
             : <CommandBarButton href="/login" onClick={logout}>

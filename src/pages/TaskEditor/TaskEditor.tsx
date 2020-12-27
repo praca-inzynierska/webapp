@@ -14,7 +14,7 @@ import {
   DefaultButton,
   Dropdown,
   IDropdownOption,
-  Label,
+  Label, PrimaryButton,
   SpinButton,
   Stack,
   Text,
@@ -49,7 +49,8 @@ class TaskEditor extends React.Component<TProps> {
     this.onTitleChange = this.onTitleChange.bind(this)
     this.onClassChange = this.onClassChange.bind(this)
     this.onUnitChange = this.onUnitChange.bind(this)
-    this.onDurationChange = this.onDurationChange.bind(this)
+    this.onDurationIncrement = this.onDurationIncrement.bind(this)
+    this.onDurationDecrement = this.onDurationDecrement.bind(this)
     this.onToolChange = this.onToolChange.bind(this)
     this.onTaskTypeChange = this.onTaskTypeChange.bind(this)
     this.launchTask = this.launchTask.bind(this)
@@ -147,11 +148,20 @@ class TaskEditor extends React.Component<TProps> {
     console.log(`${state.editedTask.subject} selected`)
   }
 
-  onDurationChange = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
+  onDurationIncrement = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
     console.log(parseInt(this.state.editedTask.minutes))
     this.setState((prevState: TState) => {
       const newEditedTask = prevState.editedTask
       newEditedTask.minutes = (parseInt(value) + 10).toString()
+      return { editedTask: newEditedTask }
+    })
+  }
+
+  onDurationDecrement = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
+    console.log(parseInt(this.state.editedTask.minutes))
+    this.setState((prevState: TState) => {
+      const newEditedTask = prevState.editedTask
+      newEditedTask.minutes = (parseInt(value) - 10).toString()
       return { editedTask: newEditedTask }
     })
   }
@@ -224,8 +234,8 @@ class TaskEditor extends React.Component<TProps> {
                   value={minutes ? minutes : '0'}
                   label={'Czas trwania'}
                   min={0}
-                  onIncrement={this.onDurationChange}
-                  onDecrement={this.onDurationChange}
+                  onIncrement={this.onDurationIncrement}
+                  onDecrement={this.onDurationDecrement}
                 />
                 <Dropdown
                   onChange={this.onUnitChange}
@@ -279,11 +289,12 @@ class TaskEditor extends React.Component<TProps> {
             </Stack>
           </Stack>
           <Stack horizontal tokens={stackTokens}>
-            <DefaultButton color="primary" onClick={this.saveTask}>
-              Save
+            <PrimaryButton color="primary" onClick={this.saveTask}>
+              Zapisz
+            </PrimaryButton>
+            <DefaultButton color="link" onClick={() => this.props.history.push('/tasks/')}>
+              Anuluj
             </DefaultButton>
-            <DefaultButton onClick={this.launchTask}>Test</DefaultButton>
-            <DefaultButton color="link">Cancel</DefaultButton>
           </Stack>
         </Stack>
       </div>
