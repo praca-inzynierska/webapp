@@ -13,7 +13,7 @@ import ClassSessionCreator from './pages/ClassSessionCreator/ClassSessionCreator
 import api from './util/api'
 import { CommandBarButton, initializeIcons, IStackStyles, Persona, PersonaSize, Stack } from 'office-ui-fabric-react'
 
-function App ({ username, logout }: any) {
+function App ({ username, logout, isTeacher }: any) {
   const routes = [
     {
       path: '/home',
@@ -52,7 +52,7 @@ function App ({ username, logout }: any) {
       component: Login,
     }
   ]
-  const stackStyles: Partial<IStackStyles> = { root: { height: 44 } }
+  const stackStyles: Partial<IStackStyles> = { root: { minHeight: 44 } }
 
   initializeIcons()
   return (
@@ -60,18 +60,18 @@ function App ({ username, logout }: any) {
       <Stack horizontal styles={stackStyles} horizontalAlign={'space-between'}>
         <Stack horizontal>
           <CommandBarButton
-            text="Sesje zadań"
+            text="Sesje"
             href="/home"
           />
-          <CommandBarButton
+          {isTeacher ? <CommandBarButton
             text="Zadania"
             href="/tasks"
-          />
+          /> : <span/>}
+
         </Stack>
 
         <Stack horizontal>
           <CommandBarButton onClick={mockDataRequest}>Mock data</CommandBarButton>
-
           {(username === undefined)
             ? <CommandBarButton href="/login">Zaloguj</CommandBarButton>
             : <CommandBarButton href="/login" onClick={logout}>
@@ -110,7 +110,8 @@ function App ({ username, logout }: any) {
 }
 
 const mapStateToProps = (state: any) => ({
-  username: state.auth.username
+  username: state.auth.username,
+  isTeacher: state.auth.isTeacher
 })
 
 const component = connect(
