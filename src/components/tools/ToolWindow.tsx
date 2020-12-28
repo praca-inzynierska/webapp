@@ -4,6 +4,7 @@ import TaskSessionModel from '../../model/TaskSessionModel'
 
 export type ToolWindowProps = ComponentProps<any> & {
   taskSession: TaskSessionModel
+  user: String
 }
 
 export class ToolWindow<T extends ToolWindowProps> extends React.Component<T> {

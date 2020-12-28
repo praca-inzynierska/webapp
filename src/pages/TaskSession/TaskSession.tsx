@@ -8,9 +8,11 @@ import api from '../../util/api'
 import moment from 'moment'
 import 'moment/locale/pl'
 import { withRouter } from 'react-router'
+import { connect } from 'react-redux'
 
 type TProps = ComponentProps<any> & {
   taskSessionId: string
+  username: string
 }
 
 type TState = {
@@ -119,7 +121,7 @@ class TaskSession extends React.Component<TProps> {
                     key={tool.toolId}
                     headerText={tool.displayName}
                   >
-                    <tool.component taskSession={this.state.taskSession}/>
+                    <tool.component taskSession={this.state.taskSession} user={this.props.username}/>
                   </PivotItem>
                 ))}
               </Pivot>
@@ -131,4 +133,12 @@ class TaskSession extends React.Component<TProps> {
   }
 }
 
-export default withRouter(TaskSession)
+const mapStateToProps = (state: any) => ({
+  username: state.auth.username
+})
+
+const component = connect(
+  mapStateToProps
+)(TaskSession)
+
+export default withRouter(component)
