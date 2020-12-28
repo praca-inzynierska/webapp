@@ -1,10 +1,10 @@
-import Student from './Student'
+import Student, { StudentUser } from './Student'
 import TaskSessionModel from './TaskSessionModel'
 import Teacher from './Teacher'
 
 export default class ClassSessionModel {
   id: number
-  students: number[] | Student[]
+  students: number[] | StudentUser[]
   teacher: number | Teacher
   taskSessions: number[] | TaskSessionModel[]
   startDate: number
@@ -12,7 +12,7 @@ export default class ClassSessionModel {
 
   constructor (
     id: number,
-    students: number[] | Student[],
+    students: number[] | StudentUser[],
     teacher: number | Teacher,
     taskSessions: number[] | TaskSessionModel[],
     startDate: number,

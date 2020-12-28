@@ -1,3 +1,5 @@
+import { ToolModel } from './ToolModel'
+
 export class Task {
   id: string | null
   name: string
@@ -27,7 +29,7 @@ export class Task {
   }
 
   public static emptyTask (): Task {
-    return new Task(null, '', '', 'matematyka', 'whiteboard', '0', new Map(), {})
+    return new Task(null, '', '', 'matematyka', 'none', '0', new Map(), {})
   }
 
   public static serialize (task: Task): string {
@@ -44,11 +46,18 @@ export class Task {
 export class TaskType {
   id: string
   name: string
+  requiredTools: ToolModel[]
 
-  constructor (id: string, name: string) {
+  constructor (id: string, name: string, requiredTools: ToolModel[]) {
     this.id = id
     this.name = name
+    this.requiredTools = requiredTools
   }
+
+  static taskTypes: TaskType[] = [
+    new TaskType('whiteboard', 'Tablica', [ToolModel.getById('whiteboard')]),
+    new TaskType('none', 'Dowolny', [])
+  ]
 }
 
 export class TimeUnit {

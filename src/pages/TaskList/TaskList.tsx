@@ -1,7 +1,7 @@
 import React, { ComponentProps } from 'react'
 import '../../index.css'
-import { DefaultButton, DetailsList, IColumn, PrimaryButton, Text } from 'office-ui-fabric-react'
-import { Task } from '../../model/Task'
+import { DefaultButton, DetailsList, IColumn, PrimaryButton, SelectionMode, Text } from 'office-ui-fabric-react'
+import { Task, TaskType } from '../../model/Task'
 import api from '../../util/api'
 import { withRouter } from 'react-router'
 
@@ -26,6 +26,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
   constructor (props: any) {
     super(props)
     this.editTask = this.editTask.bind(this)
+    this.deleteTask = this.deleteTask.bind(this)
     this.createTask = this.createTask.bind(this)
 
     this._allItems = []
@@ -39,54 +40,17 @@ class TaskList extends React.Component<ComponentProps<any>> {
         key: 'column5',
         name: '',
         fieldName: 'time',
-        minWidth: 100,
+        minWidth: 200,
         isResizable: true,
         onRender: (item: ITaskListItem) => {
-          return <DefaultButton onClick={() => this.editTask(item.id)}>Edytuj</DefaultButton>
+          return <div><DefaultButton onClick={() => this.editTask(item.id)}>Edytuj</DefaultButton>
+            <DefaultButton onClick={() => this.deleteTask(item.id)}>Usuń</DefaultButton></div>
         },
       },
     ]
 
     this.state = {
       tasks: []
-      // tasks: [
-      //   {
-      //     id: '1',
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      //   {
-      //     id: '1',
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      //   {
-      //     id: 3,
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      //   {
-      //     id: 4,
-      //     subject: 'Matematyka',
-      //     name: 'Zadanie 1',
-      //     description: 'Opis zadania 1', // to chyba niepotrzebne
-      //     type: 'test',
-      //     tools: ['whiteboard', 'textChat'], // to tez
-      //     minutes: 20,
-      //   },
-      // ].map(taskResponseMock => Task.fromResponse(taskResponseMock))
     }
   }
 
@@ -99,7 +63,7 @@ class TaskList extends React.Component<ComponentProps<any>> {
             key: index,
             id: it.id,
             name: it.name,
-            type: it.type,
+            type: TaskType.taskTypes.findByKey('id', it.type).name,
             time: `${it.minutes} minut`
           }
         )
@@ -110,6 +74,15 @@ class TaskList extends React.Component<ComponentProps<any>> {
   editTask (id: string | null) {
     const { history } = this.props
     history.push(`/task/${id}`)
+  }
+
+  deleteTask (id: string | null) {
+    const { history } = this.props
+    api.get(`tasks/delete/${id}`)
+      .then(() => {
+        history.push('/tasks')
+        this.componentDidMount()
+      })
   }
 
   createTask () {
@@ -124,52 +97,8 @@ class TaskList extends React.Component<ComponentProps<any>> {
         <DetailsList
           items={this.state.tasks}
           columns={this._columns}
-          // setKey="set"
-          // layoutMode={DetailsListLayoutMode.justified}
-          // selection={this._selection}
-          // selectionPreservedOnEmptyClick={true}
-          // ariaLabelForSelectionColumn="Toggle selection"
-          // ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-          // checkButtonAriaLabel="Row checkbox"
-          // onItemInvoked={this._onItemInvoked}
+          selectionMode={SelectionMode.none}
         />
-        {/* <Table> */}
-        {/*  <thead> */}
-        {/*  <tr> */}
-        {/*    <th>Tytuł</th> */}
-        {/*    <th>Przedmiot</th> */}
-        {/*    <th>Typ</th> */}
-        {/*    <th>Czas trwania</th> */}
-        {/*    <th>Działania</th> */}
-        {/*  </tr> */}
-        {/*  </thead> */}
-        {/*  <tfoot> */}
-        {/*  <tr> */}
-        {/*    <th>Tytuł</th> */}
-        {/*    <th>Przedmiot</th> */}
-        {/*    <th>Typ</th> */}
-        {/*    <th>Czas trwania</th> */}
-        {/*    <th>Działania</th> */}
-        {/*  </tr> */}
-        {/*  </tfoot> */}
-        {/*  <tbody> */}
-        {/*  {state.tasks.map((task, key) => ( */}
-        {/*    <tr key={key}> */}
-        {/*      <td> */}
-        {/*        {task.id} {task.name} */}
-        {/*      </td> */}
-        {/*      <td>{task.subject}</td> */}
-        {/*      <td>{task.type}</td> */}
-        {/*      <td>{task.minutes} minut</td> */}
-        {/*      <td> */}
-        {/*        <Button color="info" onClick={() => this.editTask(task.id)}> */}
-        {/*          Edytuj */}
-        {/*        </Button> */}
-        {/*      </td> */}
-        {/*    </tr> */}
-        {/*  ))} */}
-        {/*  </tbody> */}
-        {/* </Table> */}
 
         <PrimaryButton onClick={this.createTask}>
           Dodaj nowe zadanie

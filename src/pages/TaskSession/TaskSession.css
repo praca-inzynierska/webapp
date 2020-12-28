@@ -1,6 +1,8 @@
 .task-tool {
     display: flex !important;
     flex-grow: 1;
+    height: 80vmax;
+    width: 100%;
 }
 
 .columns, .column {

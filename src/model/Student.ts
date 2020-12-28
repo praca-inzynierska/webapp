@@ -1,3 +1,5 @@
+import User from './User'
+
 export default class Student {
   id: number
   name: string
@@ -9,5 +11,19 @@ export default class Student {
     this.name = name
     this.school = school
     this.schoolClass = schoolClass
+  }
+}
+
+export class StudentUser {
+  user: User
+  id: number
+  grades: number[]
+  schoolName: string
+
+  constructor (user: User, id: number, grades: number[], schoolName: string) {
+    this.user = user
+    this.id = id
+    this.grades = grades
+    this.schoolName = schoolName
   }
 }

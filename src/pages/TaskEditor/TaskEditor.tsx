@@ -3,17 +3,18 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import '../../index.css'
 import '../../util/utils'
 import api from '../../util/api'
+import { notify } from 'react-notify-toast'
 
 import Subject from '../../model/Subject'
 import Markdown from '../../components/Markdown'
 import { Task, TaskType, TimeUnit } from '../../model/Task'
-import { ToolModel } from '../../model/ToolModel'
+import { ToolModel, ToolType } from '../../model/ToolModel'
 import {
   Checkbox,
   DefaultButton,
   Dropdown,
   IDropdownOption,
-  Label,
+  Label, PrimaryButton,
   SpinButton,
   Stack,
   Text,
@@ -29,7 +30,8 @@ type TState = {
   taskId: string,
   editedTask: Task,
   taskDurationUnit: TimeUnit,
-  markdownRender: boolean
+  markdownRender: boolean,
+  enabledTools: Map<string, boolean>
 };
 
 class TaskEditor extends React.Component<TProps> {
@@ -37,6 +39,9 @@ class TaskEditor extends React.Component<TProps> {
   private units: TimeUnit[]
   private taskTypes: TaskType[]
   private tools: ToolModel[]
+  private subjectOptions: IDropdownOption[]
+  private unitOptions: IDropdownOption[]
+  private taskTypeOptions: IDropdownOption[]
   readonly state: TState
 
   constructor (props: any) {
@@ -44,6 +49,8 @@ class TaskEditor extends React.Component<TProps> {
     this.onTitleChange = this.onTitleChange.bind(this)
     this.onClassChange = this.onClassChange.bind(this)
     this.onUnitChange = this.onUnitChange.bind(this)
+    this.onDurationIncrement = this.onDurationIncrement.bind(this)
+    this.onDurationDecrement = this.onDurationDecrement.bind(this)
     this.onToolChange = this.onToolChange.bind(this)
     this.onTaskTypeChange = this.onTaskTypeChange.bind(this)
     this.launchTask = this.launchTask.bind(this)
@@ -60,19 +67,25 @@ class TaskEditor extends React.Component<TProps> {
       new TimeUnit('hour', 'godzin', 60),
       new TimeUnit('minute', 'minut', 1),
     ]
-    this.taskTypes = [
-      new TaskType('whiteboard', 'Tablica'),
-      new TaskType('test', 'Test'),
-    ]
+    this.taskTypes = TaskType.taskTypes
     this.tools = [
       ...ToolModel.communicationTools, ...ToolModel.taskTools
     ]
+    this.subjectOptions = this.subjects.map((item) => ({ key: item.id, text: item.name }))
+    this.unitOptions = this.units.map((item) => ({ key: item.id, text: item.name }))
+    this.taskTypeOptions = this.taskTypes.map((item) => ({ key: item.id, text: item.name }))
     this.state = {
       taskId,
       editedTask: Task.emptyTask(),
       taskDurationUnit: this.units.findByKey('id', 'minute'),
-      markdownRender: false
+      markdownRender: false,
+      enabledTools: new Map<string, boolean>()
     }
+    this.tools.forEach((tool) => this.state.enabledTools.set(tool.toolId, true))
+    this.taskTypes.findByKey('id', this.state.editedTask.type).requiredTools.forEach(tool => {
+      this.state.enabledTools.set(tool.toolId, false)
+      this.state.editedTask.tools.set(tool.toolId, true)
+    })
   }
 
   private deepSetState (editedProperty: string, editedNestedProperty: string, newValue: any) {
@@ -89,8 +102,17 @@ class TaskEditor extends React.Component<TProps> {
       api.get(`/tasks/${this.state.taskId}`)
         .then((response) => response.data)
         .then((data) => {
-          this.setState({
-            editedTask: Task.fromResponse(data),
+          this.setState(() => {
+            var enabledTools = this.state.enabledTools
+            var task = Task.fromResponse(data)
+            this.tools.forEach((tool) => enabledTools.set(tool.toolId, true))
+            this.taskTypes.findByKey('id', task.type).requiredTools.forEach(tool => {
+              enabledTools.set(tool.toolId, false)
+            })
+            return {
+              editedTask: task,
+              enabledTools: enabledTools
+            }
           })
         })
     }
@@ -104,7 +126,7 @@ class TaskEditor extends React.Component<TProps> {
 
   onToolChange = (event?: FormEvent<HTMLInputElement | HTMLElement> | undefined, checked?: boolean | undefined) => {
     const target = (event!.target as HTMLInputElement)
-    this.setState(this.state.editedTask.tools.set(target.id, checked!))
+    this.setState(this.state.editedTask.tools.set(target.name, checked!))
     console.log(checked)
   }
 
@@ -126,9 +148,38 @@ class TaskEditor extends React.Component<TProps> {
     console.log(`${state.editedTask.subject} selected`)
   }
 
+  onDurationIncrement = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
+    console.log(parseInt(this.state.editedTask.minutes))
+    this.setState((prevState: TState) => {
+      const newEditedTask = prevState.editedTask
+      newEditedTask.minutes = (parseInt(value) + 10).toString()
+      return { editedTask: newEditedTask }
+    })
+  }
+
+  onDurationDecrement = (value: string, event: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement> | undefined) => {
+    console.log(parseInt(this.state.editedTask.minutes))
+    this.setState((prevState: TState) => {
+      const newEditedTask = prevState.editedTask
+      newEditedTask.minutes = (parseInt(value) - 10).toString()
+      return { editedTask: newEditedTask }
+    })
+  }
+
   onTaskTypeChange = (event: FormEvent<HTMLDivElement>, option?: IDropdownOption | undefined) => {
     const { state } = this
-    this.deepSetState('editedTask', 'type', option?.key)
+    this.setState((prevState: TState) => {
+      var editedTask = prevState.editedTask
+      var enabledTools = prevState.enabledTools
+      var taskTypeId = option!.key.toString()
+      editedTask.type = taskTypeId
+      enabledTools.forEach((value, key) => enabledTools.set(key, true))
+      this.taskTypes.findByKey('id', taskTypeId).requiredTools.forEach((tool: ToolModel) => {
+        editedTask.tools.set(tool.toolId, true)
+        enabledTools.set(tool.toolId, false)
+      })
+      return { editedTask, enabledTools }
+    })
     console.log(`${state.editedTask.type} selected`)
   }
 
@@ -145,23 +196,21 @@ class TaskEditor extends React.Component<TProps> {
     const headers = {
       'Content-Type': 'application/json',
     }
-    if (id === null) {
-      api.post('/tasks/create', body, {
-        headers: headers
-      })
-    } else {
-      api.post(`/tasks/create/${id}`, body)
-    }
-    this.props.history.push('/tasks/')
+
+    api.post((id === null) ? '/tasks/create' : `/tasks/edit/${id}`, body, {
+      headers: headers
+    }).then(() => {
+      notify.show('Zadanie zapisane pomyślnie', 'success')
+      this.props.history.push('/tasks/')
+    })
+
   }
 
   render () {
     const { description, name, minutes } = this.state.editedTask
     const { state, subjects, taskTypes, units } = this
     const stackTokens = { childrenGap: 10 }
-    const subjectOptions: IDropdownOption[] = subjects.map((item) => ({ key: item.id, text: item.name }))
-    const unitOptions: IDropdownOption[] = units.map((item) => ({ key: item.id, text: item.name }))
-    const taskTypeOptions: IDropdownOption[] = taskTypes.map((item) => ({ key: item.id, text: item.name }))
+
     return (
       <div className="page">
         <Text variant='xLargePlus'>Tworzenie/edycja zadania</Text>
@@ -175,49 +224,46 @@ class TaskEditor extends React.Component<TProps> {
                 value={name}/>
               <Dropdown
                 onChange={this.onClassChange}
-                options={subjectOptions}
+                options={this.subjectOptions}
+                selectedKey={this.state.editedTask.subject}
                 label='Przedmiot'
               />
 
               <Stack horizontal tokens={stackTokens}>
                 <SpinButton
-                  value={minutes}
-                  defaultValue="0"
+                  value={minutes ? minutes : '0'}
                   label={'Czas trwania'}
                   min={0}
-                  step={10}
+                  onIncrement={this.onDurationIncrement}
+                  onDecrement={this.onDurationDecrement}
                 />
                 <Dropdown
                   onChange={this.onUnitChange}
                   placeholder={state.taskDurationUnit.name}
-                  options={unitOptions}
+                  options={this.unitOptions}
                 >
                 </Dropdown>
               </Stack>
               <Dropdown
-                options={taskTypeOptions}
+                options={this.taskTypeOptions}
                 onChange={this.onTaskTypeChange}
+                selectedKey={this.state.editedTask.type}
                 label="Typ zadania"
               />
               <Label style={{ paddingBottom: 0, marginBottom: 0 }}>Narzędzia</Label>
-              <Checkbox
-                name="textChat"
-                label="Czat tekstowy"
-                onChange={this.onToolChange}
-                checked={state.editedTask.tools.get('textChat')}
-              />
-              <Checkbox
-                name="whiteboard"
-                label="Tablica"
-                onChange={this.onToolChange}
-                checked={state.editedTask.tools.get('whiteboard')}
-              />
-              <Checkbox
-                name="voiceChat"
-                label="Czat głosowy"
-                onChange={this.onToolChange}
-                checked={state.editedTask.tools.get('voiceChat')}
-              />
+              {Array.from(this.state.enabledTools).map(([toolName, value]) => {
+                const tool = this.tools.findByKey('toolId', toolName)
+                return (
+                  <Checkbox
+                    key={toolName}
+                    name={tool.toolId}
+                    label={tool.displayName}
+                    onChange={this.onToolChange}
+                    checked={state.editedTask.tools.get(tool.toolId)}
+                    disabled={!value}
+                  />
+                )
+              })}
             </Stack>
             <Stack tokens={stackTokens} style={{ maxWidth: '50%' }} grow={1}>
               {this.state.markdownRender
@@ -243,11 +289,12 @@ class TaskEditor extends React.Component<TProps> {
             </Stack>
           </Stack>
           <Stack horizontal tokens={stackTokens}>
-            <DefaultButton color="primary" onClick={this.saveTask}>
-              Save
+            <PrimaryButton color="primary" onClick={this.saveTask}>
+              Zapisz
+            </PrimaryButton>
+            <DefaultButton color="link" onClick={() => this.props.history.push('/tasks/')}>
+              Anuluj
             </DefaultButton>
-            <DefaultButton onClick={this.launchTask}>Test</DefaultButton>
-            <DefaultButton color="link">Cancel</DefaultButton>
           </Stack>
         </Stack>
       </div>

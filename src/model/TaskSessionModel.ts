@@ -1,8 +1,8 @@
-import Student from './Student'
+import Student, { StudentUser } from './Student'
 import { Task } from './Task'
 
 export default class TaskSessionModel {
-  students: Student[]
+  students: StudentUser[]
   task: Task
   id: number
   readyToRate: boolean
@@ -10,7 +10,7 @@ export default class TaskSessionModel {
   deadline: number
   grade: number | null
 
-  constructor (students: Student[], task: Task, id: number, deadline: number, needsHelp: boolean, finished: boolean) {
+  constructor (students: StudentUser[], task: Task, id: number, deadline: number, needsHelp: boolean, finished: boolean) {
     this.students = students
     this.task = task
     this.id = id
@@ -29,7 +29,7 @@ export default class TaskSessionModel {
   }
 
   static fromResponse (data: any): TaskSessionModel {
-    return new TaskSessionModel(data.students, Task.fromResponse(data.task), data.id, data.deadline * 1000, data.needsHelp, data.readyToRate)
+    return new TaskSessionModel(data.students, Task.fromResponse(data.task), data.id, data.deadline, data.needsHelp, data.readyToRate)
   }
 
   static empty (): TaskSessionModel {

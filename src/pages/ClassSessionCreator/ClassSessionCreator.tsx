@@ -43,8 +43,8 @@ class ClassSessionCreator extends React.Component<TProps> {
       chosenSchoolClasses: new Map<SchoolClass, boolean>(),
       students: [],
       schoolClasses: [],
-      from: 0,
-      to: 0
+      from: Date.now(),
+      to: Date.now()
     }
   }
 

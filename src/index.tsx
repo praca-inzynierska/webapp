@@ -9,6 +9,7 @@ import { loadState, saveState } from './util/localStorage'
 import api from './util/api'
 import Notifications, { notify } from 'react-notify-toast'
 import { logout } from './actions/index'
+
 // import * as serviceWorker from './serviceWorker';
 
 const persistedState = loadState()
