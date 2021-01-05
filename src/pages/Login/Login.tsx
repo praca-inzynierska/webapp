@@ -75,7 +75,7 @@ class Login extends React.Component<ComponentProps<any>> {
       <div className="page">
         <Stack tokens={stackTokens}>
           <Pivot aria-label="Basic Pivot Example">
-            <PivotItem headerText="Logowanie">
+            <PivotItem headerText="Logowanie" onClick={() => this.setState({isLogin: true})}>
               <Stack tokens={stackTokens}>
                 <TextField
                   onChange={this.onInputChange}
@@ -92,7 +92,7 @@ class Login extends React.Component<ComponentProps<any>> {
                 />
               </Stack>
             </PivotItem>
-            <PivotItem headerText="Rejestracja">
+            <PivotItem headerText="Rejestracja" onClick={() => this.setState({isLogin: false})}>
               <Stack tokens={stackTokens}>
                 <TextField
                   onChange={this.onInputChange}

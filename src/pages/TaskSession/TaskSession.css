@@ -1,7 +1,7 @@
 .task-tool {
     display: flex !important;
     flex-grow: 1;
-    height: 80vmax;
+    height: 40vmax;
     width: 100%;
 }
 
